@@ -1,0 +1,105 @@
+﻿@model IEnumerable<carEVA.Models.Question>
+
+@{
+    ViewBag.Title = "Preguntas";
+}
+
+<h2>Preguntas</h2>
+<p>representa un enunciado de pregunta, para crear las respuestas ingrese a agregar respuestas.</p>
+
+@* the difference is the all items view shows course title and the back
+    button from the edit or delete does not redirect to the chapter course *@
+
+@if (ViewBag.viewType == "allItems")
+{
+    <p>
+        @Html.ActionLink("Nueva Pregunta", "Create")
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Lesson.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.statement)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.evaType)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lesson.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.statement)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.evaType)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", new { id = item.QuestionID }) |
+                    @*@Html.ActionLink("Details", "Details", new { id=item.QuestionID }) |*@
+                    @Html.ActionLink("Borrar", "Delete", new { id = item.QuestionID }) |
+                    @Html.ActionLink("Respuesta", "index", "answers", new {questionID = item.QuestionID }, null)
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+else if (ViewBag.viewType == "groupItems")
+{
+    <h3>>> @Html.DisplayFor(model => model.FirstOrDefault().Lesson.Chapter.Course.title)
+    >> @Html.DisplayFor(model => model.FirstOrDefault().Lesson.Chapter.title)
+    >> @Html.DisplayFor(model => model.FirstOrDefault().Lesson.title)</h3>
+    <p>
+        @Html.ActionLink("Nueva Pregunta", "Create", new {lessonID = Model.FirstOrDefault().LessonID })
+    </p>
+    //the only way to get a negative ID is that the controller send a
+    //dummy model object.
+    if (Model.FirstOrDefault().QuestionID >= 0)
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.statement)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.evaType)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.statement)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.evaType)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Editar", "Edit", new { id = item.QuestionID, lessonID = item.LessonID }) |
+                        @*@Html.ActionLink("Details", "Details", new { id=item.QuestionID }) |*@
+                        @Html.ActionLink("Borrar", "Delete", new { id = item.QuestionID, lessonID = item.LessonID }) |
+                        @Html.ActionLink("Respuesta", "index", "answers", new { questionID = item.QuestionID }, null)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+    else
+    {
+        <p>No hay Preguntas para esta Leccion, agregue Preguntas usando la opcion de Nueva Pregunta</p>
+    }
+
+}
+
+

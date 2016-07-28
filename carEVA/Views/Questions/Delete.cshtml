@@ -1,0 +1,54 @@
+﻿@model carEVA.Models.Question
+
+@{
+    ViewBag.Title = "Eliminar";
+}
+
+<h2>Eliminar Pregunta</h2>
+
+<h3>Esta seguro que desea eliminar esta pregunta?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Lesson.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Lesson.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.statement)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.statement)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.evaType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.evaType)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Eliminar" class="btn btn-default" /> |
+            @if (ViewBag.backToID == null)
+            {
+                @Html.ActionLink("Ir a lista de Preguntas", "Index")
+            }
+            else
+            {
+                @Html.ActionLink("Ir a lista de Preguntas", "Index", new { lessonID = ViewBag.backToID })
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,108 @@
+﻿@model IEnumerable<carEVA.Models.Chapter>
+
+@{
+    ViewBag.Title = "Capitulos";
+}
+
+<h2>Capitulos</h2>
+<p>Representa una seccion del curso que agrupa las lecciones que finalmente toma el estudiante.</p>
+
+@* the difference is the all items view shows course title and the back
+button from the edit or delete does not redirect to the chapter course *@
+
+@if (ViewBag.viewType == "chapterAll")
+{
+    <p>
+        @Html.ActionLink("Nuevo capitulo", "Create")
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Course.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.index)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Course.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.index)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", new { id = item.ChapterID }) |
+                    @*@Html.ActionLink("Details", "Details", new { id = item.ChapterID }) |*@
+                    @Html.ActionLink("Borrar", "Delete", new { id = item.ChapterID }) |
+                    @Html.ActionLink("Lecciones", "index", "lessons", new { chapterid = item.ChapterID }, null)
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+else if (ViewBag.viewType == "chapterGroup")
+{
+    <h3>
+        >> @Html.DisplayFor(model => model.FirstOrDefault().Course.title)
+    </h3>
+    <p>
+        @Html.ActionLink("Nuevo capitulo", "Create", new { courseid = Model.FirstOrDefault().CourseID })
+    </p>
+        //the only way to get a negative ID is that the controller send a
+        //dummy model object.
+        if (Model.FirstOrDefault().ChapterID >= 0)
+        {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.index)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+{
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.index)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Editar", "Edit", new { id = item.ChapterID, courseID = item.CourseID }) |
+                        @*@Html.ActionLink("Details", "Details", new { id = item.ChapterID }) |*@
+                        @Html.ActionLink("Borrar", "Delete", new { id = item.ChapterID, courseID = item.CourseID }) |
+                        @Html.ActionLink("Lecciones", "index", "lessons", new { chapterid = item.ChapterID }, null)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+    else
+    {
+        <p>No hay Capitulos para este curso, agregue capitulos usando la opcion de Nuevo Capitulo</p>
+    }
+
+}
+
+
+
+
+

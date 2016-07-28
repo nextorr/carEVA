@@ -1,0 +1,42 @@
+﻿@model carEVA.Models.Question
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Question</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Lesson.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Lesson.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.statement)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.statement)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.evaType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.evaType)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.QuestionID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

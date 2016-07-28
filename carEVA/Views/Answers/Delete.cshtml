@@ -1,0 +1,54 @@
+﻿@model carEVA.Models.Answer
+
+@{
+    ViewBag.Title = "Eliminar";
+}
+
+<h2>Eliminar</h2>
+
+<h3>Esta seguro que desea eliminar esta respuesta?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Question.statement)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Question.statement)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.text)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.text)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isCorrect)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isCorrect)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Eliminar" class="btn btn-default" /> |
+            @if (ViewBag.backToID == null)
+            {
+                @Html.ActionLink("Ir a lista de Respuestas", "Index")
+            }
+            else
+            {
+                @Html.ActionLink("Ir a lista de Respuestas", "Index", new { questionID = ViewBag.backToID })
+            }
+        </div>
+    }
+</div>

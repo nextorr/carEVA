@@ -1,0 +1,118 @@
+﻿@model IEnumerable<carEVA.Models.Lesson>
+
+@{
+    ViewBag.Title = "Lecciones";
+}
+
+<h2>Lecciones</h2>
+<p>Representa toda la informacion disponible para el estudiante.</p>
+
+
+@* the difference is the all items view shows course title and the back
+    button from the edit or delete does not redirect to the chapter course *@
+
+@if (ViewBag.viewType == "lessonAll")
+{
+    <p>
+        @Html.ActionLink("Nueva Leccion", "Create")
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Chapter.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.videoURL)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Chapter.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.videoURL)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", new { id = item.LessonID }) |
+                    @*@Html.ActionLink("Details", "Details", new { id=item.LessonID }) |*@
+                    @Html.ActionLink("Eliminar", "Delete", new { id = item.LessonID }) |
+                    @Html.ActionLink("Preguntas", "index", "questions", new { lessonid = item.LessonID }, null)
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+else if (ViewBag.viewType == "lessonGroup")
+{
+    <h3>
+    >> @Html.DisplayFor(model => model.FirstOrDefault().Chapter.Course.title)
+    >> @Html.DisplayFor(model => model.FirstOrDefault().Chapter.title)
+    </h3>
+    <p>
+        @Html.ActionLink("Nueva Leccion", "Create", new {chapterID = Model.FirstOrDefault().ChapterID })
+    </p>
+    //the only way to get a negative ID is that the controller send a
+    //dummy model object.
+    if (Model.FirstOrDefault().LessonID >= 0)
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.videoURL)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.videoURL)
+                    </td>
+                    <td>
+                        @Html.ActionLink("Editar", "Edit", new { id = item.LessonID, chapterID = item.ChapterID }) |
+                        @*@Html.ActionLink("Details", "Details", new { id=item.LessonID }) |*@
+                        @Html.ActionLink("Eliminar", "Delete", new { id = item.LessonID, chapterID = item.ChapterID })|
+                        @Html.ActionLink("Preguntas", "index", "questions", new { lessonid = item.LessonID }, null)
+                    </td>
+                </tr>
+            }
+
+        </table>
+    }
+    else
+    {
+        <p>No hay Lecciones para este capitulo, agregue lecciones usando la opcion de Nueva Leccion</p>
+    }
+}
+
+

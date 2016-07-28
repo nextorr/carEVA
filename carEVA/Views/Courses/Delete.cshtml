@@ -1,0 +1,39 @@
+﻿@model carEVA.Models.Course
+
+@{
+    ViewBag.Title = "Eliminiar";
+}
+
+<h2>Eliminar Curso</h2>
+
+<h4>Esta seguro que desea eliminar este curso?</h4>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.description)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Eliminar" class="btn btn-default" /> |
+            @Html.ActionLink("Ir a lista de cursos", "Index")
+        </div>
+    }
+</div>

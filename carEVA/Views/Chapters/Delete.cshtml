@@ -1,0 +1,54 @@
+﻿@model carEVA.Models.Chapter
+
+@{
+    ViewBag.Title = "Eliminar capitulo";
+}
+
+<h2>Eliminar Capitulo</h2>
+
+<h3>Esta seguro que desea eliminar este capitulo</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Course.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Course.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.index)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.index)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Eliminar" class="btn btn-default" /> |
+            @if (ViewBag.backToID == null)
+            {
+                @Html.ActionLink("Ir a lista de Capitulos", "Index")
+            }
+            else
+            {
+                @Html.ActionLink("Ir a lista de Capitulos", "Index", new { courseID = ViewBag.backToID })
+            }
+        </div>
+    }
+</div>

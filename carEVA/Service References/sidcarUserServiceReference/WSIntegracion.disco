@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+  <contractRef ref="https://sidcar.car.gov.co/WSIntegracion.asmx?wsdl" docRef="https://sidcar.car.gov.co/WSIntegracion.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+  <soap address="https://sidcar.car.gov.co/WSIntegracion.asmx" xmlns:q1="http://tempuri.org/" binding="q1:WSIntegracionSoap" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+  <soap address="https://sidcar.car.gov.co/WSIntegracion.asmx" xmlns:q2="http://tempuri.org/" binding="q2:WSIntegracionSoap12" xmlns="http://schemas.xmlsoap.org/disco/soap/" />
+</discovery>
