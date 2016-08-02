@@ -17,7 +17,14 @@ namespace carEVA.Models
         public string title { get; set; }
         [DisplayName("Descripcion")]
         public string description { get; set; }
-        //TODO: include de AREA and target audience
+        //AREA and target audience are in a relation with payload
+        public int? commitmentHoursPerDay { get; set; }
+        public int commitmentHoursTotal { get; set; }
+        public int commitmentDays { get; set; }
+        public int? totalQuizes { get; set; }
+        public int? totalLessons { get; set; }
+        public int evaImageID { get; set; }
+        public virtual evaImage image { get; set; }
         public virtual ICollection<Chapter> Chapters { get; set; }
         public virtual ICollection<evaFile> Files { get; set; }
     }

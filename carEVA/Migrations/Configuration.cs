@@ -38,8 +38,8 @@ namespace carEVA.Migrations
 
             var courses = new List<Course>
             {
-                new Course {title = "CURSO MANEJO SIDCAR (pruebas)", description = "Aprenda el funcionamiento del sistema documental de la CAR SIDCAR" },
-                new Course {title = "CURSO MANEJO SAE (pruebas)", description = "Aprenda el funcionamiento del sistema de administracion de expedientes de la CAR SAE" },
+                new Course {title = "CURSO MANEJO SIDCAR (pruebas)", description = "Aprenda el funcionamiento del sistema documental de la CAR SIDCAR", evaImageID = 1 },
+                new Course {title = "CURSO MANEJO SAE (pruebas)", description = "Aprenda el funcionamiento del sistema de administracion de expedientes de la CAR SAE", evaImageID=1 },
             };
             //this checks for unique titles, and fails if there are more than one course with the same title
             courses.ForEach(s => context.Courses.AddOrUpdate(p =>p.title, s));

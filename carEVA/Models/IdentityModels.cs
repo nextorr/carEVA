@@ -10,7 +10,7 @@ namespace carEVA.Models
     public class ApplicationUser : IdentityUser
     {
         //custom fields on the MVC authentication model.
-        public string userKey { get; set; }
+        //public string userKey { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

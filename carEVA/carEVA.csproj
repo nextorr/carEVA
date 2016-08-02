@@ -234,12 +234,25 @@
     <Compile Include="Migrations\201607271623411_userlogin.Designer.cs">
       <DependentUpon>201607271623411_userlogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607282023221_userRefinement.cs" />
+    <Compile Include="Migrations\201607282023221_userRefinement.Designer.cs">
+      <DependentUpon>201607282023221_userRefinement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607291640254_usermodel.cs" />
+    <Compile Include="Migrations\201607291640254_usermodel.Designer.cs">
+      <DependentUpon>201607291640254_usermodel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608012039567_fullmodelv1.cs" />
+    <Compile Include="Migrations\201608012039567_fullmodelv1.Designer.cs">
+      <DependentUpon>201608012039567_fullmodelv1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
     <Compile Include="Models\evaDbInit.cs" />
     <Compile Include="Models\evaFileModel.cs" />
     <Compile Include="Models\evaModels.cs" />
+    <Compile Include="Models\evaOrganizationModel.cs" />
     <Compile Include="Models\evaUserModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -386,6 +399,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607271623411_userlogin.resx">
       <DependentUpon>201607271623411_userlogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607282023221_userRefinement.resx">
+      <DependentUpon>201607282023221_userRefinement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607291640254_usermodel.resx">
+      <DependentUpon>201607291640254_usermodel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608012039567_fullmodelv1.resx">
+      <DependentUpon>201608012039567_fullmodelv1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

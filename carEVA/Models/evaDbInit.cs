@@ -5,7 +5,7 @@ using System.Web;
 
 namespace carEVA.Models
 {
-    public class evaDbInit : System.Data.Entity.DropCreateDatabaseIfModelChanges<carEVAContext>
+    public class evaDbInit2 : System.Data.Entity.DropCreateDatabaseIfModelChanges<carEVAContext>
     {
         protected override void Seed(carEVAContext context)
         {
