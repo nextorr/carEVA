@@ -41,5 +41,12 @@ namespace carEVA.Models
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationArea> evaOrganizationAreas { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationCourse> evaOrganizationCourses { get; set; }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            //base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<evaOrganizationCourse>().HasRequired(p => p.originArea).WithMany(m => m.organizationCourses).WillCascadeOnDelete(false);
+            modelBuilder.Entity<audiencePerCourse>().HasRequired(p => p.evaOrganizationCourse).WithMany(m => m.audienceAreas).WillCascadeOnDelete(false);
+        }
+
     }
 }

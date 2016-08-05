@@ -26,6 +26,10 @@ namespace carEVA.Models
         public bool isActive { get; set; }
         //a user can be enrrolled in multiple courses
         public virtual ICollection<evaCourseEnrollment> CourseEnrollments { get; set; }
+        //the user can be associated with only one Organization
+        public int evaOrganizationID { get; set; }
+        public virtual evaOrganization organization { get; set; }
+
     }
 
     public class evaCourseEnrollment

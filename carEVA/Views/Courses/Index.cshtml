@@ -17,6 +17,21 @@
         <th>
             @Html.DisplayNameFor(model => model.description)
         </th>
+        <th>
+            @Html.DisplayNameFor(model => model.commitmentDays)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.commitmentHoursPerDay)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.totalQuizes)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.totalLessons)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.organization.FirstOrDefault().originArea.name)
+        </th>
         <th></th>
     </tr>
 
@@ -27,6 +42,22 @@
         </td>
         <td>
             @Html.DisplayFor(modelItem => item.description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.commitmentDays)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.commitmentHoursPerDay)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalQuizes)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalLessons)
+        </td>
+        <td>
+            @* TODO: get the origin area name for the given course *@
+            @Html.DisplayFor(modelItem => item.totalLessons)
         </td>
         <td>
             @Html.ActionLink("Editar", "Edit", new { id=item.CourseID }) |

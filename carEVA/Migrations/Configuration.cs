@@ -28,6 +28,12 @@ namespace carEVA.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+            var evaOrganizations = new List<evaOrganization>
+            {
+                new evaOrganization {name = "Corporacion Autonoma Regional de Cundinamarca (pruebas)", domain="car.gov.co", address= "carrera 7 # 36 - 45", phone= "3209000" }
+            };
+            evaOrganizations.ForEach(o => context.evaOrganizations.AddOrUpdate(p => p.name, o));
+            context.SaveChanges();
             //this is required to populate the list of supported answer types
             var evaTypes = new List<evaType>
             {

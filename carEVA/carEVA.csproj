@@ -246,6 +246,22 @@
     <Compile Include="Migrations\201608012039567_fullmodelv1.Designer.cs">
       <DependentUpon>201608012039567_fullmodelv1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608021537539_courseModelRefinement.cs" />
+    <Compile Include="Migrations\201608021537539_courseModelRefinement.Designer.cs">
+      <DependentUpon>201608021537539_courseModelRefinement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608031640505_UserCourseandOrgAdjust.cs" />
+    <Compile Include="Migrations\201608031640505_UserCourseandOrgAdjust.Designer.cs">
+      <DependentUpon>201608031640505_UserCourseandOrgAdjust.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608041538135_removeAutoKeys.cs" />
+    <Compile Include="Migrations\201608041538135_removeAutoKeys.Designer.cs">
+      <DependentUpon>201608041538135_removeAutoKeys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608041929105_neworganizationcoursekeys.cs" />
+    <Compile Include="Migrations\201608041929105_neworganizationcoursekeys.Designer.cs">
+      <DependentUpon>201608041929105_neworganizationcoursekeys.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
@@ -408,6 +424,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608012039567_fullmodelv1.resx">
       <DependentUpon>201608012039567_fullmodelv1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608021537539_courseModelRefinement.resx">
+      <DependentUpon>201608021537539_courseModelRefinement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608031640505_UserCourseandOrgAdjust.resx">
+      <DependentUpon>201608031640505_UserCourseandOrgAdjust.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608041538135_removeAutoKeys.resx">
+      <DependentUpon>201608041538135_removeAutoKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608041929105_neworganizationcoursekeys.resx">
+      <DependentUpon>201608041929105_neworganizationcoursekeys.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

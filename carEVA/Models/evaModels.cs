@@ -18,15 +18,26 @@ namespace carEVA.Models
         [DisplayName("Descripcion")]
         public string description { get; set; }
         //AREA and target audience are in a relation with payload
-        public int? commitmentHoursPerDay { get; set; }
+        [DisplayName("Horas de estudio diarias")]
+        [Required(ErrorMessage = "Ingrese el numero de horas de estudio diarias")]
+        public int commitmentHoursPerDay { get; set; }
+        [DisplayName("Total de horas para completar")]
         public int commitmentHoursTotal { get; set; }
+        [DisplayName("Dias requeridos para completar")]
+        [Required(ErrorMessage = "Ingrese el numero de dias requeridos para completar")]
         public int commitmentDays { get; set; }
+        [DisplayName("Quices totales")]
         public int? totalQuizes { get; set; }
+        [DisplayName("Lecciones totales")]
         public int? totalLessons { get; set; }
         public int evaImageID { get; set; }
         public virtual evaImage image { get; set; }
+        //navigation properties: this allows me to call info from this classes
+        //directly inside views or controllers
         public virtual ICollection<Chapter> Chapters { get; set; }
         public virtual ICollection<evaFile> Files { get; set; }
+        public virtual ICollection<evaCourseEnrollment> enrollments { get; set; }
+        public virtual ICollection<evaOrganizationCourse> organization { get; set; }
     }
     public class Chapter
     {

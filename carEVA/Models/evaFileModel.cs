@@ -23,6 +23,7 @@ namespace carEVA.Models
         public virtual Chapter Chapter { get; set; }
         public virtual Lesson Lesson { get; set; }
     }
+    //generic image store
     public class evaImage
     {
         public int evaImageID{ get; set; }

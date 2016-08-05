@@ -84,6 +84,10 @@ namespace carEVA.Controllers
         {
             if (ModelState.IsValid)
             {
+                Course proxyCourse = db.Courses.Find(db.Chapters.Find(chapterID).Course.CourseID);
+                //keep track of the added lessons and update the total lessons on the database
+                proxyCourse.totalLessons ++;
+                db.Entry(proxyCourse).State = EntityState.Modified;
                 db.Lessons.Add(lesson);
                 db.SaveChanges();
                 return RedirectToAction("Index", new { chapterID = lesson.ChapterID});
