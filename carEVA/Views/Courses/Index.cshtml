@@ -30,7 +30,7 @@
             @Html.DisplayNameFor(model => model.totalLessons)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.organization.FirstOrDefault().originArea.name)
+            @Html.DisplayNameFor(model => model.totalPoints)
         </th>
         <th></th>
     </tr>
@@ -56,8 +56,7 @@
             @Html.DisplayFor(modelItem => item.totalLessons)
         </td>
         <td>
-            @* TODO: get the origin area name for the given course *@
-            @Html.DisplayFor(modelItem => item.totalLessons)
+            @Html.DisplayFor(modelItem => item.totalPoints)
         </td>
         <td>
             @Html.ActionLink("Editar", "Edit", new { id=item.CourseID }) |

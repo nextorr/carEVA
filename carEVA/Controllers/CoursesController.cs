@@ -11,6 +11,8 @@ using Microsoft.WindowsAzure.Storage;
 using System.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 
+using carEVA.Utils;
+
 namespace carEVA.Controllers
 {
     public class CoursesController : Controller
@@ -20,7 +22,6 @@ namespace carEVA.Controllers
         // GET: Courses
         public ActionResult Index()
         {
-            db.evaOrganizationCourses.Where(oc => oc.evaOrganizationID == 1).Include(b=>b.course);
             return View(db.Courses.ToList());
         }
 
@@ -42,6 +43,9 @@ namespace carEVA.Controllers
         // GET: Courses/Create
         public ActionResult Create()
         {
+            //populate the list of available areas for the course
+            //TODO: the dafault value is the organization of the logged user
+            ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name");
             return View();
         }
 
@@ -50,22 +54,46 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CourseID,title,description, commitmentDays, commitmentHoursPerDay")] Course course)
+        public ActionResult Create([Bind(Include = "CourseID,title,description, commitmentDays, commitmentHoursPerDay")] Course course, DateTime creationDate, string originAreaID, bool required, DateTime? deadline)
         {
             if (ModelState.IsValid)
             {
-                course.commitmentHoursTotal = course.commitmentDays * (int)course.commitmentHoursPerDay;
+                course.commitmentHoursTotal = course.commitmentDays * course.commitmentHoursPerDay;
                 //its a new record, so we begin with a new state
                 //important, this fields needs to be updated at runtime
                 //when the user adds a quiz or a lesson.
                 course.totalLessons = 0;
                 course.totalQuizes = 0;
+                course.totalPoints = 0;
                 //TODO: this a default image, give the option lo load 
                 //a specific image from the same form.
                 course.evaImageID = 1;
 
                 db.Courses.Add(course);
+                //save changes here because we need the courseID on the organization registration
                 db.SaveChanges();
+
+                //update the organization course related information
+                evaOrganizationCourse organizationCourse = new evaOrganizationCourse()
+                {
+                    //TODO: here is the organization of the logged user
+                    // 1 is the default for CAR.
+                    evaOrganizationID = 1,
+                    courseID = course.CourseID,
+                    originAreaID = int.Parse(originAreaID),
+                    creationDate = DateTime.Now,
+                    required = required,
+                    deadline = deadline
+                };
+
+                if(organizationUtils.incrementCourseCounter(db, organizationCourse.evaOrganizationID, organizationCourse.required) != 1)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar la organizacion para actualizar contadores");
+                }
+
+                db.evaOrganizationCourses.Add(organizationCourse);
+                db.SaveChanges();
+                
                 return RedirectToAction("Index");
             }
 
@@ -81,12 +109,13 @@ namespace carEVA.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            //Course course = db.Courses.Find(id);
-            Course course = db.Courses.Include(i => i.Chapters).Where(i => i.CourseID == id).Single();
+            Course course = db.Courses.Find(id);
+            
+            //even if courses.organizations is a collection, we are using it as single value, so this is the best method
             evaOrganizationCourse organizationCourse;
-            Chapter chapter = course.Chapters.Where(c => c.ChapterID == 1).Single();
             var query = db.evaOrganizationCourses.Where(s => s.evaOrganizationID == 1 && s.courseID == course.CourseID);
-            course.organization = query.ToList();
+            //this information is sent to the view, if there is more than one result and exception will be thrown
+            course.organizationCourse = query.ToList();
             try
             {
                 organizationCourse = query.Single();
@@ -111,11 +140,12 @@ namespace carEVA.Controllers
                 //empty organizationCourse association.
                 //this is only valid on development
                 //TODO: in production log an error here as this is an incosistency in the data model
-                ViewBag.areaNameID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name");
+                //the course must always be created with a area association
+                ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name");
             }
             else
             {
-                ViewBag.areaNameID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name",
+                ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name",
                     organizationCourse.originAreaID);
             }
             
@@ -132,17 +162,30 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public ActionResult Edit([Bind(Include = "CourseID,title,description,commitmentDays,commitmentHoursPerDay,totalQuizes,totalLessons,evaImageID")] Course course, string areaNameID)
+        public ActionResult Edit([Bind(Include = "CourseID,title,description,commitmentDays,commitmentHoursPerDay,totalQuizes,totalLessons,evaImageID")] Course course, string originAreaID, bool required, DateTime? deadline)
         {
+            //IMPORTANT NOTE: bind totalQuizes totalLessons evaImageID and any other fied that is not editable
+            //this because if we dont bind then the model set this values as null in the database, and thats an incosistency
             if (ModelState.IsValid)
             {
                 course.commitmentHoursTotal = course.commitmentDays * course.commitmentHoursPerDay;
                 //the evaOrganizationID comes from the logged user information
-                evaOrganizationCourse payload = db.evaOrganizationCourses.Single(s => s.evaOrganizationID == 1 && s.courseID == course.CourseID);
-                payload.originAreaID = int.Parse(areaNameID);
+                //update the payload information
+                evaOrganizationCourse organizationCourse;
+                try
+                {
+                    organizationCourse = db.evaOrganizationCourses.Single(s => s.evaOrganizationID == 1 && s.courseID == course.CourseID);
+                }
+                catch (Exception)
+                {
+                    //TODO: this is a inconsistency in the model, log this information and inform the user
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "the is an incosistency in the model, contact support CourseID: " + course.CourseID.ToString());
+                }
+                organizationCourse.originAreaID = int.Parse(originAreaID);
+                organizationCourse.required = required;
+                organizationCourse.deadline = deadline;
                 db.Entry(course).State = EntityState.Modified;
-                db.Entry(payload).State = EntityState.Modified;
+                db.Entry(organizationCourse).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -170,6 +213,21 @@ namespace carEVA.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Course course = db.Courses.Find(id);
+            try
+            {
+                //TODO: here is the organization of the logged user
+                // 1 is the default for CAR.
+                if (organizationUtils.decrementCourseCounter(db, 1, id) != 1)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar la organizacion para reducir los contadores");
+                }
+            }
+            catch (Exception)
+            {
+                //TODO: this is a inconsistency in the model, log this information and inform the user
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "the is an incosistency in the model, contact support CourseID: " + course.CourseID.ToString());
+            }
+
             //TODO: take care of file deletion, cant use cascade delete because we need to sync 
             //the cloud blob storage
             var files = db.Files.Where(c => c.courseID == id);

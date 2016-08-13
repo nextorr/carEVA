@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using carEVA.Models;
+using carEVA.Utils;
 
 namespace carEVA.Controllers
 {
@@ -84,10 +85,12 @@ namespace carEVA.Controllers
         {
             if (ModelState.IsValid)
             {
-                Course proxyCourse = db.Courses.Find(db.Chapters.Find(chapterID).Course.CourseID);
-                //keep track of the added lessons and update the total lessons on the database
-                proxyCourse.totalLessons ++;
-                db.Entry(proxyCourse).State = EntityState.Modified;
+                int courseID = db.Chapters.Find(lesson.ChapterID).CourseID;
+                if(courseUtils.incrementTotalLessons(db, courseID) != 1)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Course not found");
+                }
+                //succesfully added one to the course model, persist the data
                 db.Lessons.Add(lesson);
                 db.SaveChanges();
                 return RedirectToAction("Index", new { chapterID = lesson.ChapterID});
@@ -184,6 +187,11 @@ namespace carEVA.Controllers
         public ActionResult DeleteConfirmed(int id, int? chapterID)
         {
             Lesson lesson = db.Lessons.Find(id);
+            int courseID = db.Chapters.Find(lesson.ChapterID).CourseID;
+            if (courseUtils.decrementTotalLessons(db, courseID, lesson) != 1)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "curso no encontrado al tratar de actualizar los contadores");
+            }
             db.Lessons.Remove(lesson);
             db.SaveChanges();
             //now handle the chapter ID info

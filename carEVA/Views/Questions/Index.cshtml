@@ -26,6 +26,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.evaType)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.points)
+            </th>
             <th></th>
         </tr>
 
@@ -40,6 +43,9 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.evaType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.points)
                 </td>
                 <td>
                     @Html.ActionLink("Editar", "Edit", new { id = item.QuestionID }) |
@@ -72,6 +78,9 @@ else if (ViewBag.viewType == "groupItems")
                 <th>
                     @Html.DisplayNameFor(model => model.evaType)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.points)
+                </th>
                 <th></th>
             </tr>
 
@@ -83,6 +92,9 @@ else if (ViewBag.viewType == "groupItems")
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.evaType)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.points)
                     </td>
                     <td>
                         @Html.ActionLink("Editar", "Edit", new { id = item.QuestionID, lessonID = item.LessonID }) |

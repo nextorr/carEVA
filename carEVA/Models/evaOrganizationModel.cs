@@ -36,8 +36,12 @@ namespace carEVA.Models
         [DisplayName("Direccion")]
         public string address { get; set; }
         public string phone { get; set; }
+        //score card of the organization.
+        public int totalCatalogCourses { get; set; }
+        public int totalRequiredCourses { get; set; }
         //navigation properties
         public virtual ICollection<evaOrganizationArea> evaAreas { get; set; }
+        public virtual ICollection<evaOrganizationCourse> organizationCourses { get; set; }
         public virtual ICollection<evaUser> users { get; set; }
     }
     //areas for each organization
@@ -84,7 +88,7 @@ namespace carEVA.Models
         public DateTime creationDate { get; set; }
         [DisplayName("Es obligatorio")]
         public bool required { get; set; }
-        [DisplayName("Fecha Limite")]
+        [DisplayName("Fecha Limite de inscripcion")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true, NullDisplayText ="No Aplica")]
         public DateTime? deadline { get; set; }

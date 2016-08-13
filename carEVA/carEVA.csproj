@@ -209,9 +209,16 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\adminController.cs" />
     <Compile Include="Controllers\AnswersController.cs" />
+    <Compile Include="Controllers\API\apiEvaCourseEnrollmentsController.cs" />
+    <Compile Include="Controllers\API\apiCourseCatalogController.cs" />
     <Compile Include="Controllers\API\apiCoursesController.cs" />
     <Compile Include="Controllers\API\apiEvaLogInsController.cs" />
+    <Compile Include="Controllers\API\apiGraderController.cs" />
+    <Compile Include="Controllers\API\apiLessonDetailController.cs" />
+    <Compile Include="Controllers\API\apiQuestionDetailsController.cs" />
+    <Compile Include="Controllers\API\apiScoreController.cs" />
     <Compile Include="Controllers\API\ChaptersController.cs" />
     <Compile Include="Controllers\API\evaFilesController.cs" />
     <Compile Include="Controllers\API\LessonsController.cs" />
@@ -262,6 +269,26 @@
     <Compile Include="Migrations\201608041929105_neworganizationcoursekeys.Designer.cs">
       <DependentUpon>201608041929105_neworganizationcoursekeys.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608061520034_minorchangeCourse.cs" />
+    <Compile Include="Migrations\201608061520034_minorchangeCourse.Designer.cs">
+      <DependentUpon>201608061520034_minorchangeCourse.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608082007282_minorEnrollmentChange.cs" />
+    <Compile Include="Migrations\201608082007282_minorEnrollmentChange.Designer.cs">
+      <DependentUpon>201608082007282_minorEnrollmentChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608091917064_scorecards.cs" />
+    <Compile Include="Migrations\201608091917064_scorecards.Designer.cs">
+      <DependentUpon>201608091917064_scorecards.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608112024168_lessondetailnulldate.cs" />
+    <Compile Include="Migrations\201608112024168_lessondetailnulldate.Designer.cs">
+      <DependentUpon>201608112024168_lessondetailnulldate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608121945014_gradingmodelAdjustement.cs" />
+    <Compile Include="Migrations\201608121945014_gradingmodelAdjustement.Designer.cs">
+      <DependentUpon>201608121945014_gradingmodelAdjustement.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
@@ -279,6 +306,11 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <Compile Include="Utils\courseUtils.cs" />
+    <Compile Include="Utils\organizationUtils.cs" />
+    <Compile Include="Utils\userUtils.cs" />
+    <Compile Include="ViewModels\evaUserViewModels.cs" />
+    <Compile Include="ViewModels\userCourseCatalogViewModels.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
@@ -397,9 +429,11 @@
     <Content Include="Views\file\Index.cshtml" />
     <Content Include="Views\file\Delete.cshtml" />
     <None Include="Service References\sidcarUserServiceReference\WSIntegracion.wsdl" />
+    <Content Include="Views\admin\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\apiLessonDetail\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -436,6 +470,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608041929105_neworganizationcoursekeys.resx">
       <DependentUpon>201608041929105_neworganizationcoursekeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608061520034_minorchangeCourse.resx">
+      <DependentUpon>201608061520034_minorchangeCourse.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608082007282_minorEnrollmentChange.resx">
+      <DependentUpon>201608082007282_minorEnrollmentChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608091917064_scorecards.resx">
+      <DependentUpon>201608091917064_scorecards.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608112024168_lessondetailnulldate.resx">
+      <DependentUpon>201608112024168_lessondetailnulldate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608121945014_gradingmodelAdjustement.resx">
+      <DependentUpon>201608121945014_gradingmodelAdjustement.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

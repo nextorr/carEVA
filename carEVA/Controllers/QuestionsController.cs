@@ -8,6 +8,8 @@ using System.Web;
 using System.Web.Mvc;
 using carEVA.Models;
 
+using carEVA.Utils;
+
 namespace carEVA.Controllers
 {
     public class QuestionsController : Controller
@@ -82,10 +84,16 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "QuestionID,statement,evaType,LessonID")] Question question, int? lessonID)
+        public ActionResult Create([Bind(Include = "QuestionID,statement,evaType,points,LessonID")] Question question, int? lessonID)
         {
             if (ModelState.IsValid)
             {
+                int courseID = db.Lessons.Find(question.LessonID).Chapter.CourseID;
+                //update the total quizes and total points counter
+                if (courseUtils.incrementTotalQuizesAndPoints(db, courseID, question.points) != 1)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar curso para incrementar el contador de quizes y puntos");
+                }
                 db.Questions.Add(question);
                 db.SaveChanges();
                 return RedirectToAction("Index", new { lessonID = lessonID });
@@ -136,10 +144,16 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "QuestionID,statement,evaType,LessonID")] Question question, int? lessonID)
+        public ActionResult Edit([Bind(Include = "QuestionID,statement,evaType,points,LessonID")] Question question, int? lessonID, int orgPoints)
         {
             if (ModelState.IsValid)
             {
+                //we are using a hidden field on the view to keep track of the original value
+                int courseID = db.Lessons.Find(question.LessonID).Chapter.CourseID;
+                if (courseUtils.modifyTotalPoints(db, courseID, question.points, orgPoints) != 1)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar curso para modificar el contador de y puntos");
+                }
                 db.Entry(question).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index", new {lessonID = lessonID });
@@ -184,6 +198,11 @@ namespace carEVA.Controllers
         public ActionResult DeleteConfirmed(int id, int? lessonID)
         {
             Question question = db.Questions.Find(id);
+            int CourseID = db.Lessons.Find(question.LessonID).Chapter.CourseID;
+            if(courseUtils.decrementTotalQuizesAndPoints(db, CourseID, question.points) != 1)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al elcontrar el curso para reducir el numero de quizes y puntos");
+            }
             db.Questions.Remove(question);
             db.SaveChanges();
             //noew handle the lessonID

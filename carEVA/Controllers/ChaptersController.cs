@@ -8,6 +8,8 @@ using System.Web;
 using System.Web.Mvc;
 using carEVA.Models;
 
+using carEVA.Utils;
+
 namespace carEVA.Controllers
 {
     public class ChaptersController : Controller
@@ -188,6 +190,10 @@ namespace carEVA.Controllers
         public ActionResult DeleteConfirmed(int id, int? courseID)
         {
             Chapter chapter = db.Chapters.Find(id);
+            if(courseUtils.countDeletedLessons(db, chapter.CourseID, chapter) != 1)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al actualizar el contado eliminando un capitulo");
+            }
             db.Chapters.Remove(chapter);
             db.SaveChanges();
             if (courseID != null)

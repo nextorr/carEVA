@@ -16,20 +16,20 @@ using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace carEVA.Controllers.API
 {
-    public class apiEvaLogInsController : ApiController
+    public class evaLogInsController : ApiController
     {
         private carEVAContext db = new carEVAContext();
         private sidcarUserServiceReference.WSIntegracionSoapClient sidcarProxy = new sidcarUserServiceReference.WSIntegracionSoapClient();
         private UserManager<ApplicationUser> manager = new UserManager<ApplicationUser>
             (new UserStore<ApplicationUser>(new ApplicationDbContext()));
 
-        // GET: api/apiEvaLogIns
+        // GET: api/evalogIns
         public IQueryable<evaLogIn> GetevaLogIns()
         {
             return db.evaLogIns;
         }
 
-        // GET: api/apiEvaLogIns/5
+        // GET: api/evalogIns/5
         [ResponseType(typeof(evaLogIn))]
         public IHttpActionResult GetevaLogIn(int id)
         {
@@ -42,7 +42,7 @@ namespace carEVA.Controllers.API
             return Ok(evaLogIn);
         }
 
-        // PUT: api/apiEvaLogIns/5
+        // PUT: api/evalogIns/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutevaLogIn(int id, evaLogIn evaLogIn)
         {
@@ -77,7 +77,7 @@ namespace carEVA.Controllers.API
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // POST: api/apiEvaLogIns
+        // POST: api/evalogIns
         [ResponseType(typeof(evaLogIn))]
         public async Task<IHttpActionResult> PostevaLogIn([FromBody] evaLogIn evaLogIn)
         {
@@ -178,7 +178,7 @@ namespace carEVA.Controllers.API
             return CreatedAtRoute("DefaultApi", new { id = evaLogIn.evaLogInID }, evaLogIn);
         }
 
-        // DELETE: api/apiEvaLogIns/5
+        // DELETE: api/evalogIns/5
         [ResponseType(typeof(evaLogIn))]
         public IHttpActionResult DeleteevaLogIn(int id)
         {

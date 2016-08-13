@@ -13,8 +13,10 @@ namespace carEVA.Models
     public class Course
     {
         public int CourseID { get; set; }
+        [Required(ErrorMessage = "Debe ingresar un Titulo")]
         [DisplayName("Curso")]
         public string title { get; set; }
+        [Required(ErrorMessage = "Debe ingresar una descripcion")]
         [DisplayName("Descripcion")]
         public string description { get; set; }
         //AREA and target audience are in a relation with payload
@@ -30,6 +32,8 @@ namespace carEVA.Models
         public int? totalQuizes { get; set; }
         [DisplayName("Lecciones totales")]
         public int? totalLessons { get; set; }
+        [DisplayName("total de puntos")]
+        public int totalPoints { get; set; }
         public int evaImageID { get; set; }
         public virtual evaImage image { get; set; }
         //navigation properties: this allows me to call info from this classes
@@ -37,7 +41,7 @@ namespace carEVA.Models
         public virtual ICollection<Chapter> Chapters { get; set; }
         public virtual ICollection<evaFile> Files { get; set; }
         public virtual ICollection<evaCourseEnrollment> enrollments { get; set; }
-        public virtual ICollection<evaOrganizationCourse> organization { get; set; }
+        public virtual ICollection<evaOrganizationCourse> organizationCourse { get; set; }
     }
     public class Chapter
     {
@@ -46,6 +50,8 @@ namespace carEVA.Models
         public string title { get; set; }
         [DisplayName("Orden")]
         public int index { get; set; }
+        [DisplayName("total de puntos")]
+        public int totalPoints { get; set; }
         public int CourseID { get; set; }
         public virtual Course Course { get; set; }
         public virtual ICollection<Lesson> lessons { get; set; }
@@ -77,6 +83,9 @@ namespace carEVA.Models
         public string statement { get; set; }
         [DisplayName("Tipo de Pregunta")]
         public string evaType { get; set; }
+        [DisplayName("Puntos")]
+        [Required(ErrorMessage = "la pregunta debe tener un puntaje"), DefaultValue(0)]
+        public int points { get; set; }
         public int LessonID { get; set; }
         public virtual Lesson Lesson { get; set; }
         public virtual ICollection<Answer> answerOptions { get; set; }
