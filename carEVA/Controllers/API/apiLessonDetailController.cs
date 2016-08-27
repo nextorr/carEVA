@@ -89,19 +89,27 @@ namespace carEVA.Controllers.API
                             dataToSave = true;
                         }
                     }
-                    //clean some fileds before storing the result to avoid redundant data to be sent
-                    detailBuilder.userDetail.courseEnrollment = null;
-                    detailBuilder.info.Chapter = null;
                     itemBuilder.lessons.Add(detailBuilder);
                 }
-                //clean some fileds before sending the response to avoid redundant data to be sent
-                itemBuilder.chapter.lessons = null;
                 response.Add(itemBuilder);
             }
 
-            //save changes is there is something to ADD to the database
+            //save changes if there is something to ADD to the database
             if(dataToSave)
                 db.SaveChanges();
+
+            //clean some fileds before storing the result to avoid redundant data to be sent
+            //IMPORTANT: do response modifications here, after the data is saved in the database.
+            //to avoid model invalidation errors
+            foreach (userChapterDetail item in response)
+            {
+                item.chapter.lessons = null;
+                foreach (userLessonDetail detailItem in item.lessons)
+                {
+                    detailItem.userDetail.courseEnrollment = null;
+                    detailItem.info.Chapter = null;
+                }
+            }
 
             return Ok(response);
         }

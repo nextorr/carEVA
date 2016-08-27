@@ -289,11 +289,24 @@
     <Compile Include="Migrations\201608121945014_gradingmodelAdjustement.Designer.cs">
       <DependentUpon>201608121945014_gradingmodelAdjustement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608261654241_logmodel.cs" />
+    <Compile Include="Migrations\201608261654241_logmodel.Designer.cs">
+      <DependentUpon>201608261654241_logmodel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608262040493_logmodelmod.cs" />
+    <Compile Include="Migrations\201608262040493_logmodelmod.Designer.cs">
+      <DependentUpon>201608262040493_logmodelmod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608262140341_logmodelmod2.cs" />
+    <Compile Include="Migrations\201608262140341_logmodelmod2.Designer.cs">
+      <DependentUpon>201608262140341_logmodelmod2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
     <Compile Include="Models\evaDbInit.cs" />
     <Compile Include="Models\evaFileModel.cs" />
+    <Compile Include="Models\evaLogModel.cs" />
     <Compile Include="Models\evaModels.cs" />
     <Compile Include="Models\evaOrganizationModel.cs" />
     <Compile Include="Models\evaUserModel.cs" />
@@ -307,6 +320,8 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\courseUtils.cs" />
+    <Compile Include="Utils\enrollmentUtils.cs" />
+    <Compile Include="Utils\evaLogUtils.cs" />
     <Compile Include="Utils\organizationUtils.cs" />
     <Compile Include="Utils\userUtils.cs" />
     <Compile Include="ViewModels\evaUserViewModels.cs" />
@@ -485,6 +500,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608121945014_gradingmodelAdjustement.resx">
       <DependentUpon>201608121945014_gradingmodelAdjustement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608261654241_logmodel.resx">
+      <DependentUpon>201608261654241_logmodel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608262040493_logmodelmod.resx">
+      <DependentUpon>201608262040493_logmodelmod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608262140341_logmodelmod2.resx">
+      <DependentUpon>201608262140341_logmodelmod2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

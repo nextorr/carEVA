@@ -13,6 +13,7 @@ using carEVA.Models;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using carEVA.Utils;
 
 namespace carEVA.Controllers.API
 {
@@ -26,6 +27,11 @@ namespace carEVA.Controllers.API
         // GET: api/evalogIns
         public IQueryable<evaLogIn> GetevaLogIns()
         {
+            //use this to test the log database
+            db.Configuration.ProxyCreationEnabled = false;
+            evaLogUtils.logErrorMessage("Error logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
+            evaLogUtils.logInfoMessage("Info logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
+            evaLogUtils.logWarningMessage("Warning logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
             return db.evaLogIns;
         }
 
@@ -83,10 +89,14 @@ namespace carEVA.Controllers.API
         {
             if (!ModelState.IsValid)
             {
+                evaLogUtils.logErrorMessage("invalid model",
+                    this.ToString() + "."+ nameof(this.PostevaLogIn));
                 return BadRequest(ModelState);
             }
             if (evaLogIn == null) {
-                return BadRequest("no information received");
+                evaLogUtils.logErrorMessage("No information received", 
+                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                return BadRequest("No information received");
             }
 
 
@@ -95,6 +105,8 @@ namespace carEVA.Controllers.API
             //According to specification if the query is invalid the service will send an error
             if (response.Body.SignInJsonResult.StartsWith("ERROR"))
             {
+                evaLogUtils.logErrorMessage("Invalid service Query, SIDCAR service responded with " + response.Body.SignInJsonResult,
+                    this.ToString() + "." + nameof(this.PostevaLogIn));
                 return BadRequest("invalid query");
             }
             //here the response is OK to parse
@@ -102,13 +114,20 @@ namespace carEVA.Controllers.API
             //check if the response is parsed correctly
             if (jsonResult == null || !jsonResult.HasValues)
             {
-                return InternalServerError(new Exception("sidcar negotiation failed"));
+                string error = "Parsing SIDCAR response failed";
+                evaLogUtils.logErrorMessage(error + " SIDCAR service responded with " + response.Body.SignInJsonResult,
+                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                return BadRequest(error);
+                //return InternalServerError(new Exception("sidcar negotiation failed"));
             }
             string serviceMessage = (string)jsonResult["MsngRespuesta"];
             //According to specification, the service returns in MsngRespuesta its status on the login
             if (!serviceMessage.StartsWith("OK"))
             {
-                return BadRequest("Access denied, invalid user or password");
+                string error = "Access denied, invalid user or password";
+                evaLogUtils.logErrorMessage(error + " by user:  " + evaLogIn.user,
+                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                return BadRequest(error);
             }
             //the parsed response is valid from here.
 
@@ -140,6 +159,10 @@ namespace carEVA.Controllers.API
                 db.evaUsers.Add(newUser);
                 db.SaveChanges();
 
+                evaLogUtils.logInfoMessage("created " + newUser.userName +
+                        " in ASP and eva log ins",
+                        this.ToString() + "." + nameof(this.PostevaLogIn));
+
                 //return CreatedAtRoute("DefaultApi", new { id = evaLogIn.evaLogInID }, evaLogIn);
             }
             else
@@ -153,13 +176,19 @@ namespace carEVA.Controllers.API
                     evaLogIn.passKey = originalUser.publicKey;
                     evaLogIn.user = originalUser.userName;
 
+                    evaLogUtils.logInfoMessage("renewed Public key for user: " + newUser.userName,
+                        this.ToString() + "." + nameof(this.PostevaLogIn));
+
                 }
                 else
                 {
                     //this must not happend, as its an inconsistency, 
                     //the user exist in asp logins but not in the user eva model
                     //but still, if this happens add the user log in
-                    //TODO: log this information.
+                    evaLogUtils.logWarningMessage("model inconsistency, user " + newUser.userName +
+                        " Exist in ASP logins but not on evaLogIns",
+                        this.ToString() + "." + nameof(this.PostevaLogIn));
+
                     evaLogIn.passKey = newPublicKey;
                     evaLogIn.user = newUser.userName;
                     //db.evaLogIns.Add(evaLogIn);

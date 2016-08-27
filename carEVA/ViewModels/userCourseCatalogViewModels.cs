@@ -26,6 +26,12 @@ namespace carEVA.ViewModels
         public evaLessonDetail userDetail { get; set; }
     }
 
+    public class userQuiz
+    {
+        public Question question { get; set; }
+        public evaQuestionDetail detail { get; set; }
+    }
+
     public class response
     {
         public int questionID { get; set; }

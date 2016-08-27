@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using carEVA.Models;
 using carEVA.Utils;
+using carEVA.ViewModels;
 
 namespace carEVA.Controllers.API
 {
@@ -17,21 +18,47 @@ namespace carEVA.Controllers.API
     {
         private carEVAContext db = new carEVAContext();
         // GET: api/questiondetails
-        [ResponseType(typeof(IQueryable<evaQuestionDetail>))]
+        [ResponseType(typeof(IQueryable<userQuiz>))]
         public IHttpActionResult GetevaQuestionDetails(string publicKey, int lessonDetailID)
         {
             db.Configuration.ProxyCreationEnabled = false;
             //validate the public key
             //this is slightly different from the method used in apiGrader controller, check which is best
             evaLessonDetail currentLessonDetail = db.evaLessonDetails.Where(p => p.evaLessonDetailID == lessonDetailID)
-                .Include(m => m.questionDetail).Single();
+                .Include(m => m.questionDetail).Include(m => m.courseEnrollment).Single();
             int currentUser = userUtils.userIdFromKey(db, publicKey);
             if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
             {
                 return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
             }
             //TODO: must also return the question info, create a viewmodel for that.
-            return Ok(currentLessonDetail.questionDetail);
+            List<userQuiz> response = new List<userQuiz>();
+            var lessonQuestions = db.Questions.Where(p => p.LessonID == currentLessonDetail.lessonID).Include(m => m.answerOptions);
+            foreach(Question questionItem in lessonQuestions)
+            {
+                //match the current question with its detail to build the response
+                var detailList = currentLessonDetail.questionDetail.Where(q => q.questionID == questionItem.QuestionID);
+                evaQuestionDetail currentDetail = null;
+
+                try
+                {
+                    currentDetail = detailList.Single();
+                }
+                catch (InvalidOperationException)
+                {
+                    if(detailList.Count() > 1)
+                    {
+                        return BadRequest("ERROR: inconsistencia en el modelo, existe mas de un detalle para una pregunta");
+                    }
+                }
+                //when the user first opens the quiz, we expect the detail to be empty, since single() fails, null is sent
+                response.Add(new userQuiz()
+                {
+                    question = questionItem,
+                    detail = currentDetail
+                });
+            }
+            return Ok(response.AsQueryable());
         }
 
         // GET: api/questiondetails/5

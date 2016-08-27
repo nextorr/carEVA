@@ -13,7 +13,7 @@ namespace carEVA.Models
         // If you want Entity Framework to drop and regenerate your database
         // automatically whenever you change your model schema, please use data migrations.
         // For more information refer to the documentation:
-        // http://msdn.microsoft.com/en-us/data/jj591621.aspx
+        // http://msdn.microsoft.com/en-us/data/jj591621.aspxe:\Nestor\documents\visual studio 2015\Projects\carEVA\carEVA\Models\carEVAContext.cs
     
         public carEVAContext() : base("name=carEVAContext")
         {
@@ -40,6 +40,7 @@ namespace carEVA.Models
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganization> evaOrganizations { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationArea> evaOrganizationAreas { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationCourse> evaOrganizationCourses { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.evaLog> evaLogs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

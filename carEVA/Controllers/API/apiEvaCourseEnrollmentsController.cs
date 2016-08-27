@@ -36,7 +36,8 @@ namespace carEVA.Controllers
                 foreach(evaOrganizationCourse orgCourseItem in companyParameters)
                 {
                     //we need to send in the response if the course is required, so we buld our view model
-                    if((enrollmentItem.CourseID == orgCourseItem.courseID) && orgCourseItem.required)
+                    // NOTE removed  && orgCourseItem.required
+                    if ((enrollmentItem.CourseID == orgCourseItem.courseID))
                     {
                         //since we are bulding the reponse from scratch, remove the user info since we dont need it
                         enrollmentItem.evaUser = null;
@@ -108,7 +109,7 @@ namespace carEVA.Controllers
             {
                 return BadRequest(ModelState);
             }
-            if (enrollment == null)
+            if (enrollment == null && enrollment.publicKey == null && enrollment.courseID <= 0)
             {
                 return BadRequest("no information received");
             }
@@ -121,6 +122,8 @@ namespace carEVA.Controllers
             };
             if (userUtils.incrementEnrolledCourses(db, enrollment.publicKey) != 1)
             {
+                //this just checks that we made the increment at entity level, 
+                //this is not saved to database until we call savechanges
                 return BadRequest("Error al actualizar los contadores del usuario");
             }
             db.evaCourseEnrollments.Add(newEnrollment);
