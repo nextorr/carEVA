@@ -21,13 +21,30 @@ namespace carEVA.Controllers
         private carEVAContext db = new carEVAContext();
 
         // GET: api/courseEnrollments
-        public IQueryable<userEnrollmets> GetcourseEnrollments(string publicKey)
+        [ResponseType(typeof(userEnrollmets))]
+        public IHttpActionResult GetcourseEnrollments(string publicKey)
         {
             //use this parameter if you dont want all the children to be populated
             List<userEnrollmets> response = new List<userEnrollmets>();
             db.Configuration.ProxyCreationEnabled = false;
-            int userId = userUtils.userIdFromKey(db, publicKey);
-            int userCompany = userUtils.organizationIdFromKey(db, publicKey);
+
+            int userId;
+            int userCompany;
+
+
+            try
+            {
+                userId = userUtils.userIdFromKey(db, publicKey);
+                userCompany = userUtils.organizationIdFromKey(db, publicKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    publicKey, e, this.ToString(), nameof(this.GetcourseEnrollments));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
+
             var enrollments = db.evaCourseEnrollments.Where(m => m.evaUserID == userId).Include(c => c.Course).ToList();
             var companyParameters = db.evaOrganizationCourses.Where(m => m.evaOrganizationID == userCompany).ToList();
 
@@ -35,8 +52,7 @@ namespace carEVA.Controllers
             {
                 foreach(evaOrganizationCourse orgCourseItem in companyParameters)
                 {
-                    //we need to send in the response if the course is required, so we buld our view model
-                    // NOTE removed  && orgCourseItem.required
+                    
                     if ((enrollmentItem.CourseID == orgCourseItem.courseID))
                     {
                         //since we are bulding the reponse from scratch, remove the user info since we dont need it
@@ -50,7 +66,7 @@ namespace carEVA.Controllers
                 }
             }
 
-            return response.AsQueryable();
+            return Ok(response);
         }
 
         // GET: api/courseEnrollments/5
@@ -102,20 +118,35 @@ namespace carEVA.Controllers
         }
 
         // POST: api/courseEnrollments
-        [ResponseType(typeof(evaCourseEnrollment))]
+        [ResponseType(typeof(evaResponses))]
         public IHttpActionResult PostcourseEnrollment([FromBody] userCourseEnrollment enrollment)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (enrollment == null && enrollment.publicKey == null && enrollment.courseID <= 0)
+            if (enrollment == null || enrollment.publicKey == null || enrollment.courseID <= 0)
             {
                 return BadRequest("no information received");
             }
+
+
+            int userID;
+            try
+            {
+                userID = userUtils.userIdFromKey(db, enrollment.publicKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    enrollment.publicKey, e, this.ToString(), nameof(this.PostcourseEnrollment));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
+
             evaCourseEnrollment newEnrollment = new evaCourseEnrollment
             {
-                evaUserID = userUtils.userIdFromKey(db, enrollment.publicKey),
+                evaUserID = userID,
                 CourseID = enrollment.courseID,
                 completedLessons = 0,
                 EnrollmentDate = DateTime.Now
@@ -124,12 +155,12 @@ namespace carEVA.Controllers
             {
                 //this just checks that we made the increment at entity level, 
                 //this is not saved to database until we call savechanges
-                return BadRequest("Error al actualizar los contadores del usuario");
+                return BadRequest("ERROR : 200, unable to update counters");
             }
             db.evaCourseEnrollments.Add(newEnrollment);
             db.SaveChanges();
 
-            return Ok(newEnrollment);
+            return Created("DefaultApi", new evaResponses("enrolled succesfull", "OK"));
         }
 
         // DELETE: api/courseEnrollments/5

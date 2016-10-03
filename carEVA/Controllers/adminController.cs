@@ -21,9 +21,8 @@ namespace carEVA.Controllers
         public ActionResult syncScoreCounters()
         {
 
-            if (userUtils.syncCoursesCountes(db) >= 0 && organizationUtils.syncTotalCoursesCountes(db) >= 0)
+            if (userUtils.syncAllCounters(db) <= 0)
             {
-                //TODO:the previous methods do nothing because they do not commit the changes to the database
                 return RedirectToAction("Index");
             }
                 

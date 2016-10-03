@@ -28,6 +28,10 @@ namespace carEVA.Controllers.API
         public IHttpActionResult GetevaFile(int id)
         {
             db.Configuration.ProxyCreationEnabled = false;
+            if (id < 0)
+            {
+                return BadRequest("ERROR : invalid argument");
+            }
             //we expect to receive the id of the lesson, from there get the chapter and course ID
             //TODO: here we are checking only for global files, 
             //we need a function to get the chapter files and the lesson files only

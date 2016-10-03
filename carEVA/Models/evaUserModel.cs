@@ -43,6 +43,7 @@ namespace carEVA.Models
         public int CourseID { get; set; }
         public int evaUserID { get; set; }
         //this is to show the user a quick view of the completed lessons like 3/10
+        //as 20 sept, this represent the total viewed lessons
         public int completedLessons { get; set; }
         public int? finalScore { get; set; }
         public int currentScore { get; set; }

@@ -18,21 +18,52 @@ namespace carEVA.Controllers.API
     {
         private carEVAContext db = new carEVAContext();
         // GET: api/questiondetails
-        [ResponseType(typeof(IQueryable<userQuiz>))]
+        //[ResponseType(typeof(IQueryable<userQuiz>))]
+        [ResponseType(typeof(userQuizDetail))]
         public IHttpActionResult GetevaQuestionDetails(string publicKey, int lessonDetailID)
         {
             db.Configuration.ProxyCreationEnabled = false;
-            //validate the public key
-            //this is slightly different from the method used in apiGrader controller, check which is best
-            evaLessonDetail currentLessonDetail = db.evaLessonDetails.Where(p => p.evaLessonDetailID == lessonDetailID)
-                .Include(m => m.questionDetail).Include(m => m.courseEnrollment).Single();
-            int currentUser = userUtils.userIdFromKey(db, publicKey);
-            if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+
+            if (lessonDetailID < 0)
             {
-                return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
+                evaLogUtils.logWarningMessage("invalid lessonDetailID",
+                    this.ToString(), nameof(this.GetevaQuestionDetails));
+                return BadRequest("ERROR : invalid parameters");
             }
+
+            evaLessonDetail currentLessonDetail;
+            int currentUser;
+            try
+            {
+                //validate the public key
+                //this is slightly different from the method used in apiGrader controller, check which is best
+                currentLessonDetail = db.evaLessonDetails.Where(p => p.evaLessonDetailID == lessonDetailID)
+                    .Include(m => m.questionDetail).Include(m => m.courseEnrollment).Single();
+                currentUser = userUtils.userIdFromKey(db, publicKey);
+                if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+                {
+                    evaLogUtils.logWarningMessage("invalid publick key for the evaluation",
+                        this.ToString(), nameof(this.GetevaQuestionDetails));
+                    return BadRequest("ERROR : la clave publica no es valida para esta evaluacion");
+                }
+            }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    publicKey, e, this.ToString(), nameof(this.GetevaQuestionDetails));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
+
+            
             //TODO: must also return the question info, create a viewmodel for that.
-            List<userQuiz> response = new List<userQuiz>();
+            List<userQuiz> quizDetailList = new List<userQuiz>();
+
+            userQuizDetail response = new userQuizDetail();
+            response.viewed = currentLessonDetail.viewed;
+            response.passed = currentLessonDetail.passed;
+            response.totalObtainedPoints = currentLessonDetail.currentTotalGrade;
+
             var lessonQuestions = db.Questions.Where(p => p.LessonID == currentLessonDetail.lessonID).Include(m => m.answerOptions);
             foreach(Question questionItem in lessonQuestions)
             {
@@ -44,21 +75,29 @@ namespace carEVA.Controllers.API
                 {
                     currentDetail = detailList.Single();
                 }
-                catch (InvalidOperationException)
+                catch (InvalidOperationException e)
                 {
+                    evaLogUtils.logErrorMessage("model incosistency getting current detail",
+                    publicKey, e, this.ToString(), nameof(this.GetevaQuestionDetails));
                     if(detailList.Count() > 1)
                     {
-                        return BadRequest("ERROR: inconsistencia en el modelo, existe mas de un detalle para una pregunta");
+                        return BadRequest("ERROR : inconsistencia en el modelo, existe mas de un detalle para una pregunta");
                     }
+                    //return BadRequest("ERROR : inconsistencia en el modelo, no hay detalle para la pregunta");
                 }
                 //when the user first opens the quiz, we expect the detail to be empty, since single() fails, null is sent
-                response.Add(new userQuiz()
+                quizDetailList.Add(new userQuiz()
                 {
                     question = questionItem,
                     detail = currentDetail
                 });
             }
-            return Ok(response.AsQueryable());
+
+            response.quizDetail = quizDetailList;
+
+            //return Ok(response.AsQueryable());
+            return Ok(response);
+
         }
 
         // GET: api/questiondetails/5

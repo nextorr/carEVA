@@ -20,14 +20,27 @@ namespace carEVA.Controllers.API
         private carEVAContext db = new carEVAContext();
 
         // GET: api/courseCatalog
-        //TODO: add the [frombody] annotation to receive ths public key from the body of the request
-        public IQueryable<evaOrganizationCourse> GetCourses(string publicKey)
+        [ResponseType(typeof(evaOrganizationCourse))]
+        public IHttpActionResult GetCourses(string publicKey)
         {
             //use this parameter if you dont want all the children to be populated
-            
+            int orgID;
+            int userId;
+
+
             db.Configuration.ProxyCreationEnabled = false;
-            int orgID = userUtils.organizationIdFromKey(db, publicKey);
-            int userId = userUtils.userIdFromKey(db, publicKey);
+            try
+            {
+                orgID = userUtils.organizationIdFromKey(db, publicKey);
+                userId = userUtils.userIdFromKey(db, publicKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    publicKey, e, this.ToString(), nameof(this.GetCourses));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
 
             //force the execution of the query here so the loops dont fail (deffered execution)
             var userEnrollments = db.evaCourseEnrollments.Where(p => p.evaUserID == userId).ToList();
@@ -46,7 +59,7 @@ namespace carEVA.Controllers.API
                 }
             }
 
-            return orgCourses.AsQueryable();
+            return Ok(orgCourses);
         }
 
         // GET: api/courseCatalog/5
@@ -105,29 +118,44 @@ namespace carEVA.Controllers.API
         /// <param name="enrollment">enrollment to commit</param>
         /// <returns></returns>
         // POST: api/courseCatalog
+        [ResponseType(typeof(evaOrganizationCourse))]
         public IHttpActionResult PostCourse([FromBody] userCourseEnrollment enrollment)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            if (enrollment == null)
-            {
-                return BadRequest("no information received");
-            }
-            evaCourseEnrollment newEnrollment = new evaCourseEnrollment
-            {
-                evaUserID = userUtils.userIdFromKey(db, enrollment.publicKey),
-                CourseID = enrollment.courseID,
-                completedLessons = 0,
-                EnrollmentDate = DateTime.Now
-            };
-            db.evaCourseEnrollments.Add(newEnrollment);
-            db.SaveChanges();
-            //db.Courses.Add(course);
+            return BadRequest("ERROR : 600, method not implemented");
+            //TODO: marked to delete, enrollments are handled on the enrollment controller
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState);
+            //}
+            //if (enrollment == null)
+            //{
+            //    return BadRequest("no information received");
+            //}
+
+            //int userID;
+            //try
+            //{
+            //    userID = userUtils.userIdFromKey(db, enrollment.publicKey);
+            //}
+            //catch (InvalidOperationException e)
+            //{
+            //    //report the service client that the key they are using is invalid.
+            //    evaLogUtils.logErrorMessage("invalid public Key",
+            //        enrollment.publicKey, e.Message, this.ToString(), nameof(this.GetCourses));
+            //    return BadRequest("ERROR : 100, the public key is invalid");
+            //}
+
+            //evaCourseEnrollment newEnrollment = new evaCourseEnrollment
+            //{
+            //    evaUserID = userID,
+            //    CourseID = enrollment.courseID,
+            //    completedLessons = 0,
+            //    EnrollmentDate = DateTime.Now
+            //};
+            //db.evaCourseEnrollments.Add(newEnrollment);
             //db.SaveChanges();
 
-            return StatusCode(HttpStatusCode.OK);
+            //return Created("DefaultApi", new evaResponses("enrolled succesfull", "OK"));
         }
 
         // DELETE: api/courseCatalog/5

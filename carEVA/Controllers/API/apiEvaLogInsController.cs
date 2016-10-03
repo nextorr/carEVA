@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using carEVA.Utils;
+using carEVA.ViewModels;
 
 namespace carEVA.Controllers.API
 {
@@ -25,14 +26,11 @@ namespace carEVA.Controllers.API
             (new UserStore<ApplicationUser>(new ApplicationDbContext()));
 
         // GET: api/evalogIns
-        public IQueryable<evaLogIn> GetevaLogIns()
+        public IHttpActionResult GetevaLogIns()
         {
             //use this to test the log database
             db.Configuration.ProxyCreationEnabled = false;
-            evaLogUtils.logErrorMessage("Error logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
-            evaLogUtils.logInfoMessage("Info logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
-            evaLogUtils.logWarningMessage("Warning logger testing", this.ToString() + "." + nameof(this.GetevaLogIns));
-            return db.evaLogIns;
+            return Ok(new evaResponses("method not implemented", "Ok"));
         }
 
         // GET: api/evalogIns/5
@@ -90,12 +88,12 @@ namespace carEVA.Controllers.API
             if (!ModelState.IsValid)
             {
                 evaLogUtils.logErrorMessage("invalid model",
-                    this.ToString() + "."+ nameof(this.PostevaLogIn));
+                    this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest(ModelState);
             }
             if (evaLogIn == null) {
                 evaLogUtils.logErrorMessage("No information received", 
-                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                    this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest("No information received");
             }
 
@@ -106,7 +104,7 @@ namespace carEVA.Controllers.API
             if (response.Body.SignInJsonResult.StartsWith("ERROR"))
             {
                 evaLogUtils.logErrorMessage("Invalid service Query, SIDCAR service responded with " + response.Body.SignInJsonResult,
-                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                    this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest("invalid query");
             }
             //here the response is OK to parse
@@ -116,7 +114,7 @@ namespace carEVA.Controllers.API
             {
                 string error = "Parsing SIDCAR response failed";
                 evaLogUtils.logErrorMessage(error + " SIDCAR service responded with " + response.Body.SignInJsonResult,
-                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                    this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest(error);
                 //return InternalServerError(new Exception("sidcar negotiation failed"));
             }
@@ -126,7 +124,7 @@ namespace carEVA.Controllers.API
             {
                 string error = "Access denied, invalid user or password";
                 evaLogUtils.logErrorMessage(error + " by user:  " + evaLogIn.user,
-                    this.ToString() + "." + nameof(this.PostevaLogIn));
+                    this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest(error);
             }
             //the parsed response is valid from here.
@@ -138,7 +136,11 @@ namespace carEVA.Controllers.API
                 email = (string)jsonResult["EMail"],
                 gender = (string)jsonResult["Sexo"],
                 areaCar = (string)jsonResult["IDOficinaActual"],
-                isActive = (bool)jsonResult["Activo"]
+                isActive = (bool)jsonResult["Activo"], 
+                totalEnrollments = 0,
+                completedCatalogCourses = 0,
+                completedRequiredCourses = 0,
+                evaOrganizationID = 1
 
             };
 
@@ -157,11 +159,12 @@ namespace carEVA.Controllers.API
                 //but on the data side its just reduntant
                 //db.evaLogIns.Add(evaLogIn);
                 db.evaUsers.Add(newUser);
-                db.SaveChanges();
+                //db.SaveChanges();
+                
 
                 evaLogUtils.logInfoMessage("created " + newUser.userName +
                         " in ASP and eva log ins",
-                        this.ToString() + "." + nameof(this.PostevaLogIn));
+                        this.ToString(), nameof(this.PostevaLogIn));
 
                 //return CreatedAtRoute("DefaultApi", new { id = evaLogIn.evaLogInID }, evaLogIn);
             }
@@ -177,7 +180,7 @@ namespace carEVA.Controllers.API
                     evaLogIn.user = originalUser.userName;
 
                     evaLogUtils.logInfoMessage("renewed Public key for user: " + newUser.userName,
-                        this.ToString() + "." + nameof(this.PostevaLogIn));
+                        this.ToString(), nameof(this.PostevaLogIn));
 
                 }
                 else
@@ -187,7 +190,7 @@ namespace carEVA.Controllers.API
                     //but still, if this happens add the user log in
                     evaLogUtils.logWarningMessage("model inconsistency, user " + newUser.userName +
                         " Exist in ASP logins but not on evaLogIns",
-                        this.ToString() + "." + nameof(this.PostevaLogIn));
+                        this.ToString(), nameof(this.PostevaLogIn));
 
                     evaLogIn.passKey = newPublicKey;
                     evaLogIn.user = newUser.userName;
@@ -197,8 +200,20 @@ namespace carEVA.Controllers.API
                     db.evaUsers.Add(newUser);
 
                 }
-                db.SaveChanges();
             }
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("cannot create eva user ",
+                    newUser.userName, e, this.ToString(), nameof(this.GetevaLogIn));
+                return BadRequest("ERROR : 400, cannot create eva user");
+            }
+
 
             //this piece is used to delete the first record on the aspnetuser table
             //ApplicationUser aspnetUser = manager.Users.First();

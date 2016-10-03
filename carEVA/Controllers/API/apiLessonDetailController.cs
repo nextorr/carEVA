@@ -21,23 +21,50 @@ namespace carEVA.Controllers.API
         public IHttpActionResult GetlessonDetails(int courseID, string publicKey)
         {
             db.Configuration.ProxyCreationEnabled = false;
-            int currentUserID = userUtils.userIdFromKey(db, publicKey);
             List<userChapterDetail> response = new List<userChapterDetail>();
+
+            if (courseID < 0)
+            {
+                return BadRequest("ERROR 200 : invalid parameters");
+            }
+
+            int currentUserID;
+
+            try
+            {
+               currentUserID = userUtils.userIdFromKey(db, publicKey);
+            }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    publicKey, e, this.ToString(), nameof(this.GetlessonDetails));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
+
             //get the chapter and lessons list for the given course
             var chapterList = db.Chapters.Where(m => m.CourseID == courseID).Include(m => m.lessons).ToList();
+
             evaCourseEnrollment enrollment;
             try
             {
                 enrollment = db.evaCourseEnrollments.Where(m => m.CourseID == courseID && m.evaUserID == currentUserID)
                 .Include(m => m.lessonDetail).Single();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
-                return BadRequest("ERROR: el usuario esta inscrito 2 veces en el mismo curso");
+                evaLogUtils.logErrorMessage("user not enrolled or enrolled more than one time",
+                    publicKey, e, this.ToString(), nameof(this.GetlessonDetails));
+                return BadRequest("ERROR : el usuario no esta inscrito o esta inscrito mas de una vez al curso");
             }
             if(chapterList == null)
             {
-                return BadRequest("no hay lecciones aun para el curso seleccionado");
+                //then log the information
+                evaLogUtils.logWarningMessage("no lessons for the selected course " + courseID.ToString(),
+                     this.ToString(), nameof(this.GetlessonDetails));
+                //return an empty response
+                return Ok(new userChapterDetail());
+                //return BadRequest("ERROR : no hay lecciones aun para el curso seleccionado");
             }
             
             //merge de chapterinfo (title..etc) with the user detail (completed ones etc..)

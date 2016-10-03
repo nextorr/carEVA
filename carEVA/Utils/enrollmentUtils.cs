@@ -38,15 +38,15 @@ namespace carEVA.Utils
             context.Entry(enrollment).State = EntityState.Modified;
             return 1;
         }
-        public static int incrementScoreAndCompletedLessons(carEVAContext context, int EnrollmentID, int score)
+        public static int updateScoreAndCompletedLessons(carEVAContext context, int EnrollmentID, int scoreDiff, int passedDiff)
         {
             evaCourseEnrollment enrollment = context.evaCourseEnrollments.Find(EnrollmentID);
             if (enrollment == null)
             {
                 return -1;
             }
-            enrollment.currentScore = enrollment.currentScore + score;
-            enrollment.completedLessons++;
+            enrollment.currentScore = enrollment.currentScore + scoreDiff;
+            enrollment.completedLessons = enrollment.completedLessons + passedDiff;
             context.Entry(enrollment).State = EntityState.Modified;
             return 1;
         }

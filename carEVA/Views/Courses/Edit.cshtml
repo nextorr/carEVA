@@ -58,33 +58,33 @@
         the correct data *@
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organization.FirstOrDefault().originAreaID, "Area de Origen", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().originAreaID, "Area de Origen", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownList("originAreaID", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.organization.FirstOrDefault().originAreaID, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().originAreaID, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organization.FirstOrDefault().creationDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().creationDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DisplayFor(model => model.organization.FirstOrDefault().creationDate)
+                @Html.DisplayFor(model => model.organizationCourse.FirstOrDefault().creationDate)
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organization.FirstOrDefault().required, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().required, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organization.FirstOrDefault().required, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.organization.FirstOrDefault().required, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().required, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().required, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organization.FirstOrDefault().deadline, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().deadline, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organization.FirstOrDefault().deadline, new { htmlAttributes = new { @class = "form-control datepicker" } })
-                @Html.ValidationMessageFor(model => model.organization.FirstOrDefault().deadline, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().deadline, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().deadline, "", new { @class = "text-danger" })
             </div>
         </div>
 

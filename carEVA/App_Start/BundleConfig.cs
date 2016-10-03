@@ -8,11 +8,24 @@ namespace carEVA
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            //*******************JavaScript bundles****************************
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
+
+            bundles.Add(new ScriptBundle("~/bundles/jqueryUI").Include(
+                        "~/Scripts/jquery-ui-{version}.js"));
+
+            //bundle the eva upload video helper
+            bundles.Add(new ScriptBundle("~/bundles/evaVideoUpload").Include(
+                        "~/Scripts/eva/evaVideoUploader.js"));
+
+            //bundle for the jquery file upload plugin
+            bundles.Add(new ScriptBundle("~/bundles/fileUpload").Include(
+                "~/Scripts/jQuery.FileUpload/jquery.iframe-transport.js",
+                "~/Scripts/jQuery.FileUpload/jquery.fileupload.js"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
             // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -23,9 +36,19 @@ namespace carEVA
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js"));
 
+            //*******************style bundles***********************************
+
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            //bundle the required styles for the jquery file upload plugin
+            bundles.Add(new StyleBundle("~/Content/fileUpload").Include(
+                      "~/Content/jQuery.FileUpload/css/jquery.fileupload.css"));
+
+            //bundle custom styles for the file upload plugin
+            bundles.Add(new StyleBundle("~/Content/evaFileUpload").Include(
+                      "~/Content/eva/evaFileUpload.css"));
         }
     }
 }

@@ -25,7 +25,13 @@ namespace carEVA.ViewModels
         public Lesson info  { get; set; }
         public evaLessonDetail userDetail { get; set; }
     }
-
+    public class userQuizDetail
+    {
+        public bool viewed { get; set; }
+        public bool passed { get; set; }
+        public int totalObtainedPoints { get; set; }
+        public ICollection<userQuiz> quizDetail { get; set; }
+    }
     public class userQuiz
     {
         public Question question { get; set; }

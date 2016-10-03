@@ -13,6 +13,7 @@ using carEVA.Models;
 using carEVA.ViewModels;
 using carEVA.Utils;
 using System.Web.Mvc;
+using System.Threading.Tasks;
 
 namespace carEVA.Controllers.API
 {
@@ -21,31 +22,41 @@ namespace carEVA.Controllers.API
         private carEVAContext db = new carEVAContext();
         // GET: api/score
         [ResponseType(typeof(userOverviewScore))]
-        public IHttpActionResult Getscore(string publicKey)
+        public async Task<IHttpActionResult> Getscore(string publicKey)
         {
-            evaUser currentUser;
+            evaUser currentUser=null;
             evaOrganization currentOrganization;
             userOverviewScore response;
+
+            evaLogUtils.logInfoMessage("score request", this.ToString(), nameof(this.Getscore));
+
             try
             {
-                currentUser = db.evaUsers.Where(p => p.publicKey == publicKey).Include(p => p.CourseEnrollments).Single();
-                currentOrganization = db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).
-                    Include(p => p.organizationCourses).Single();
+                //currentUser = db.evaUsers.Where(p => p.publicKey == publicKey).Include(p => p.CourseEnrollments).Single();
+                //currentOrganization = db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).
+                //    Include(p => p.organizationCourses).Single();
+                currentUser = await db.evaUsers.Where(p => p.publicKey == publicKey).SingleAsync();
+                currentOrganization = await db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).SingleAsync();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 //report the service client that the key they are using is invalid.
                 //view log notes for more info on how to return error messages.
-                return BadRequest("100:ERROR the public key is invalid");
+                evaLogUtils.logErrorMessage("model inconsistency ", publicKey, e , 
+                    this.ToString(), nameof(this.Getscore));
+                return BadRequest("ERROR : 100, the public key is invalid");
             }
 
             response = new userOverviewScore()
             {
-                totalActiveEnrollments = currentUser.CourseEnrollments.Count(),
-                totalCatalogCourses = currentOrganization.organizationCourses.Where(q => q.required == false).Count(),
+                //totalActiveEnrollments = currentUser.CourseEnrollments.Count(),
+                totalActiveEnrollments = currentUser.totalEnrollments,
+                //totalCatalogCourses = currentOrganization.organizationCourses.Where(q => q.required == false).Count(),
+                totalCatalogCourses = currentOrganization.totalCatalogCourses,
                 //TODO: complete this information when the evaluation logic in completed
                 completedCatalogCourses = 0,
-                totalRequiredCourses = currentOrganization.organizationCourses.Where(q => q.required == true).Count(),
+                //totalRequiredCourses = currentOrganization.organizationCourses.Where(q => q.required == true).Count(),
+                totalRequiredCourses = currentOrganization.totalRequiredCourses,
                 //TODO: complete this information when the evaluation logic in completed
                 completedRequiredCourses = 0,
                 

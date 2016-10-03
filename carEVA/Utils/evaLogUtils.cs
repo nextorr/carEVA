@@ -13,7 +13,7 @@ namespace carEVA.Utils
         private static LogLevels level = LogLevels.full;
         
         //error are always logged
-        public static void logErrorMessage(string message, string origin)
+        public static void logErrorMessage(string message, string originClass, string originMethod)
         {
             //in theory starting a new thread this way will make use resources outside of the 
             // ASP thread pool. this way the service call can return even if the Log have not been written to the database
@@ -21,33 +21,61 @@ namespace carEVA.Utils
             Thread th = new Thread(writeLogMessageInDatabase);
             th.Start(new evaLog() {
                 level = "ERROR",
-                message = message,
-                caller = origin,
+                message = (message != null ? message : "null"),
+                caller = (originClass != null ? originClass : "null") + "."
+                + (originMethod != null ? originMethod : "null"),
                 date = DateTime.Now });
         }
 
-        public static void logWarningMessage(string message, string origin)
+        public static void logErrorMessage(string message, Object parameter, Exception exception, string originClass, string originMethod)
+        {
+            //this beign a exception handler we must check every parameter
+            string exceptionMessage = "Exception: ";
+            while (exception != null)
+            {
+                exceptionMessage += exception.Message + " -- ";
+                exception = exception.InnerException;
+            }
+
+            string proxyMsg = (message != null ? message:"null")  + "source: " + 
+                (parameter != null ? parameter.ToString() + " " : "null") + exceptionMessage;
+            Thread th = new Thread(writeLogMessageInDatabase);
+            th.Start(new evaLog()
+            {
+                level = "ERROR",
+                message = proxyMsg,
+                caller = (originClass != null ? originClass : "null") + "."
+                + (originMethod != null ? originMethod : "null"),
+                date = DateTime.Now
+            });
+        }
+
+        public static void logWarningMessage(string message, string originClass, string originMethod)
         {
             if (level == LogLevels.full || level == LogLevels.warning)
             {
                 Thread th = new Thread(writeLogMessageInDatabase);
                 th.Start(new evaLog() {
                     level = "WARNING",
-                    message = message,
-                    caller = origin,
-                    date = DateTime.Now });
+                    message = (message != null ? message : "null"),
+                    caller = (originClass != null ? originClass : "null") + "."
+                        + (originMethod != null ? originMethod : "null"),
+                    date = DateTime.Now
+                });
             }
         }
-        public static void logInfoMessage(string message, string origin)
+        public static void logInfoMessage(string message, string originClass, string originMethod)
         {
             if (level == LogLevels.full)
             {
                 Thread th = new Thread(writeLogMessageInDatabase);
                 th.Start(new evaLog() {
                     level = "INFO",
-                    message = message,
-                    caller = origin,
-                    date = DateTime.Now });
+                    message = (message != null ? message : "null"),
+                    caller = (originClass != null ? originClass : "null") + "."
+                        + (originMethod != null ? originMethod : "null"),
+                    date = DateTime.Now
+                });
             }
             
         }

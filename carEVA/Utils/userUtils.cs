@@ -24,7 +24,7 @@ namespace carEVA.Utils
 
         public static int organizationIdFromKey(carEVAContext context, string publicKey)
         {
-            return context.evaUsers.Where(u => u.publicKey == publicKey).Single().evaOrganizationID;
+            return context.evaUsers.Where(u => u.publicKey == publicKey).Single().evaOrganizationID; 
         }
 
         //---------------------------------------------------------------------------------------------
@@ -52,27 +52,18 @@ namespace carEVA.Utils
             //this are tested directly in SSMS
             totalEntitites = context.Database.ExecuteSqlCommand(
                 "update evausers set totalEnrollments ="+
-                "(select COUNT(*) from evacourseenrollments"+
+                "(select COUNT(*) from evacourseenrollments "+
                 "where evacourseenrollments.evauserID = evausers.evauserID)"
                 );
-
-            //WARNING: this EF routine requires a database access for every entity wich is extreemly ineficient.
-            //update the total enrollments for every user.
-            //var users = context.evaUsers.Include(m => m.CourseEnrollments);
-            //foreach(evaUser userItem in users)
-            //{
-            //    try
-            //    {
-            //        userItem.totalEnrollments = userItem.CourseEnrollments.Count();
-            //    }
-            //    catch (Exception)
-            //    {
-            //        return -1;
-            //    }
-            //    totalEntitites++;
-            //    //TODO: do completedCatalogCourses and completedRequiredCourses when the evaluation logic is completed
-            //}
+            
             return totalEntitites;
+        }
+        //---------------------------------------------------------------------------------------------
+        public static int syncAllCounters(carEVAContext context)
+        {
+            int result = 0;
+            result = context.Database.ExecuteSqlCommand("exec sp_updateCounters");
+            return result;
         }
         //---------------------------------------------------------------------------------------------
     }

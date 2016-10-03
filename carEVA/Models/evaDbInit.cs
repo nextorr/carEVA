@@ -1,4 +1,5 @@
-﻿using System;
+﻿using carEVA.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -36,8 +37,8 @@ namespace carEVA.Models
             context.SaveChanges();
             var questions = new List<Question>
             {
-                new Question {LessonID = 1, statement = "Cual es la forma mas rapida de crear un memorando?", evaType="single" },
-                new Question {LessonID = 1, statement = "cual opcion me permite realizar un cambio de contraseña?", evaType="single" },
+                new Question {LessonID = 1, statement = "Cual es la forma mas rapida de crear un memorando?", evaType="single", points = 10 },
+                new Question {LessonID = 1, statement = "cual opcion me permite realizar un cambio de contraseña?", evaType="single", points = 10 },
             };
             questions.ForEach(s => context.Questions.Add(s));
             context.SaveChanges();
@@ -52,6 +53,11 @@ namespace carEVA.Models
             };
             answers.ForEach(s => context.Answers.Add(s));
             context.SaveChanges();
+
+
+            //sync the databse tale counters
+            userUtils.syncAllCounters(context);
         }
+        
     }
 }

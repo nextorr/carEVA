@@ -21,13 +21,29 @@ namespace carEVA.Controllers.API
         public IHttpActionResult Getgrader(string publicKey, quizResponses quizResponse)
         {
             db.Configuration.ProxyCreationEnabled = false;
-            evaLessonDetail currentLessonDetail = db.evaLessonDetails.Find(quizResponse.lessonDetailID);
-            //validate the publickey
-            int currentUser = userUtils.userIdFromKey(db, publicKey);
-            if(currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+
+            evaLessonDetail currentLessonDetail;
+            int currentUser;
+
+            try
             {
-                return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
+                currentLessonDetail = db.evaLessonDetails.Find(quizResponse.lessonDetailID);
+                //validate the publickey
+                currentUser = userUtils.userIdFromKey(db, publicKey);
+                if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+                {
+                    return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
+                }
             }
+            catch (InvalidOperationException e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("invalid public Key",
+                    publicKey, e, this.ToString(), nameof(this.Getgrader));
+                return BadRequest("ERROR : 100, the public key is invalid");
+            }
+
+            
 
             //query the list of questions and its detail for the given lesson
             var questions = db.Questions.Where(p => p.LessonID == currentLessonDetail.lessonID)
@@ -133,6 +149,8 @@ namespace carEVA.Controllers.API
                 else
                 {
                     //model inconsistency, there is more than one detail for the answer for the given user.
+                    evaLogUtils.logWarningMessage("model inconsistency getting questionDetail",
+                        this.ToString(), nameof(this.Getgrader));
                     return BadRequest("ERROR: inconsistencia, se encontro mas de 1 detalle para la despuesta");
                 }
 
@@ -187,13 +205,20 @@ namespace carEVA.Controllers.API
             var questionDetail = currentLessonDetail.questionDetail.ToList();
             int score = 0;
             int totalLessonPoints = 0;
+
+            //score controllers
+            float pointsForAnswer = 0;
+            int grongAttempt = 0;
+            bool correct = true;
+            int reduceMaxScoreWeight = 0;
+
             foreach (response responseItem in quizResponse.responses)
             {
                 //evaluation parameters, initialize as the current response is correct
-                float pointsForAnswer = 0;
-                int grongAttempt = 0;
-                bool correct = true;
-                int reduceMaxScoreWeight = 0;
+                pointsForAnswer = 0;
+                grongAttempt = 0;
+                correct = true;
+                reduceMaxScoreWeight = 0;
                 //get the question info
                 Question questionInfo = questions.Where(q => q.QuestionID == responseItem.questionID).Single();
                 totalLessonPoints = totalLessonPoints + questionInfo.points;
@@ -246,9 +271,22 @@ namespace carEVA.Controllers.API
                 {
                     //there exist a question detail for this answer.
                     evaQuestionDetail qDetails = questionDetail.Where(q => q.questionID == responseItem.questionID).FirstOrDefault();
+                    if (qDetails.isCorrect == true) {
+                        //the users previously answered correctly
+                        //just use the detail information to update the score counter
+                        if (qDetails.finalScore != null)
+                        {
+                            score = score + (int)qDetails.finalScore;
+                            continue;
+                        }
+                        else {
+                            evaLogUtils.logWarningMessage("Model inconsistency: correct answer detail has no final score", this.ToString(), nameof(this.Putgrader));
+                        }
+                        
+                    }
                     if (questionInfo.answerOptions.Where(q => q.AnswerID == responseItem.answerID).Single().isCorrect)
                     {
-                        //the selected answer for this question is correct
+                        //the selected answer for this question is correct :)
                         pointsForAnswer = (questionInfo.points * qDetails.currentMaxScore) / 100;
                         score = score + (int)Math.Ceiling(pointsForAnswer); //round Up to the highest number
                     }
@@ -291,21 +329,29 @@ namespace carEVA.Controllers.API
                 }
 
             }
-            //grade the entire quiz to 60% of total points minimum to pass
+            //a little hack to take into account that an empty set can be received
+            //when the user selects no answer and hits evaluate
+            if (score == 0 && totalLessonPoints == 0) {
+                //this forces to fail the evaluation correctly
+                totalLessonPoints = 10;
+            }
+            //IMPORTANT!!! grade the entire quiz to 60% of total points minimum to pass
+            enrollmentUtils.updateScoreAndCompletedLessons(db, enrollmentID,
+                   (score - currentLessonDetail.currentTotalGrade),
+                   (currentLessonDetail.viewed ? 0 : 1));
             if (score >= (totalLessonPoints * 0.6))
             {
-                //passed
+                //passed :)
+                //increment the counters in the enrollment
+                //later the changes are persisted into the database
                 currentLessonDetail.viewed = true;
                 currentLessonDetail.passed = true;
                 currentLessonDetail.currentTotalGrade = score;
                 currentLessonDetail.completionDate = DateTime.Now;
-                //increment the counters in the enrollment
-                //later the changes are persisted into the database
-                enrollmentUtils.incrementScoreAndCompletedLessons(db, enrollmentID, score);
             }
             else
             {
-                //not passed :(
+                //did not pass :(
                 currentLessonDetail.viewed = true;
                 currentLessonDetail.passed = false;
                 currentLessonDetail.currentTotalGrade = score;
@@ -314,8 +360,9 @@ namespace carEVA.Controllers.API
             db.SaveChanges();
 
             //remove some navigation properties before sending the response
+            //and after persisting the changes to the database
             currentLessonDetail.courseEnrollment = null;
-            currentLessonDetail.questionDetail = null;
+            //currentLessonDetail.questionDetail = null;
             return Ok(currentLessonDetail);
         }
 

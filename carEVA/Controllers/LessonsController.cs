@@ -6,6 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+
+using System.Threading;
+
 using carEVA.Models;
 using carEVA.Utils;
 
@@ -83,6 +86,9 @@ namespace carEVA.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "LessonID,title,description,videoURL,ChapterID")] Lesson lesson, int? chapterID)
         {
+            evaMediaServices mediaService = new evaMediaServices();
+            string fileLocation;
+
             if (ModelState.IsValid)
             {
                 int courseID = db.Chapters.Find(lesson.ChapterID).CourseID;
@@ -90,9 +96,16 @@ namespace carEVA.Controllers
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Course not found");
                 }
+                //save the file location and give the user feedback that the video is uploading
+                fileLocation = lesson.videoURL;
+                lesson.videoURL = "Procesando y publicando video";
                 //succesfully added one to the course model, persist the data
                 db.Lessons.Add(lesson);
                 db.SaveChanges();
+                //use the lesson ID to save the video in the backgroud.
+                //in video URL we receive the location on file System, use that info to upload the video to azure
+                //this method start a tread to handle the upload in the backgroud
+                mediaService.uploadVideoToAzure(fileLocation, lesson.LessonID);
                 return RedirectToAction("Index", new { chapterID = lesson.ChapterID});
             }
             //now handle the chapter ID info
