@@ -1,4 +1,4 @@
-﻿@model carEVA.Models.Course
+﻿@model carEVA.ViewModels.CoursesViewModels
 
 @{
     ViewBag.Title = "Editar";
@@ -6,8 +6,16 @@
 
 <h2>Editar informacion del curso</h2>
 <p>Edite la informacion basica del curso en esta pagina, para agregar informacion al curso como capitulos y lecciones
-    haga clck en el boton de Agregar Capitulo</p>
+    haga click en el boton de Agregar Capitulo</p>
 
+@if (Model.isInternal)
+{
+    <h2>interno</h2>
+}
+else
+{
+    <h2>externo</h2>
+}
 
 @using (Html.BeginForm())
 {
@@ -17,74 +25,80 @@
         
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.CourseID)
-        @Html.HiddenFor(model => model.evaImageID)
-        @Html.HiddenFor(model => model.totalLessons)
-        @Html.HiddenFor(model => model.totalQuizes)
+        @* not editable course fields *@
+        @Html.HiddenFor(model => model.course.CourseID)
+        @Html.HiddenFor(model => model.course.evaImageID)
+        @Html.HiddenFor(model => model.course.totalLessons)
+        @Html.HiddenFor(model => model.course.totalQuizes)
+        @Html.HiddenFor(model => model.course.evaInstructorID)
+        @* not editable organization course fields *@
+        @Html.HiddenFor(model => model.organizationInfo.creationDate)
+        @Html.HiddenFor(model => model.organizationInfo.evaOrganizationCourseID)
+        @Html.HiddenFor(model => model.organizationInfo.evaOrganizationID)
+        @Html.HiddenFor(model => model.organizationInfo.courseID)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.title, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.title, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.description, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.description, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.description, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.commitmentDays, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.commitmentDays, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.commitmentDays, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.commitmentDays, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.commitmentDays, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.commitmentDays, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.commitmentHoursPerDay, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.commitmentHoursPerDay, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.commitmentHoursPerDay, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.commitmentHoursPerDay, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.commitmentHoursPerDay, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.commitmentHoursPerDay, "", new { @class = "text-danger" })
             </div>
         </div>
 
-        @* for this related information, the controller is making sure ONLY ONE result is sent here, so we are safe that firstOrDefalut contains
-        the correct data *@
+        @* for this related information, the controller is making sure ONLY ONE result is sent here*@
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().originAreaID, "Area de Origen", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.originAreaID, "Area de Origen", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("originAreaID", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().originAreaID, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().creationDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DisplayFor(model => model.organizationCourse.FirstOrDefault().creationDate)
+                @Html.DropDownList("organizationInfo.originAreaID", (SelectList)ViewBag.originAreaID, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.organizationInfo.originAreaID, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().required, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.creationDate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().required, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().required, "", new { @class = "text-danger" })
+                @Html.DisplayFor(model => model.organizationInfo.creationDate)
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().deadline, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.required, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().deadline, new { htmlAttributes = new { @class = "form-control datepicker" } })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().deadline, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.organizationInfo.required, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.organizationInfo.required, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.organizationInfo.deadline, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.organizationInfo.deadline, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.organizationInfo.deadline, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -96,9 +110,18 @@
     </div>
 }
 
-<div>
-    @Html.ActionLink("Ir a lista de cursos", "Index")
-</div>
+@if (Model.isInternal)
+{
+    <div>
+        @Html.ActionLink("Ir a lista de cursos", "Index")
+    </div>
+}
+else
+{
+    <div>
+        @Html.ActionLink("Ir a lista de cursos", "Index", new { organizationAreaID = Model.organizationInfo.originAreaID })
+    </div>
+}
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")

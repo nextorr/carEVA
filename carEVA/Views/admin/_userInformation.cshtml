@@ -1,0 +1,75 @@
+﻿@model IEnumerable<carEVA.Models.evaCourseEnrollment>
+
+
+<h2>Course Enrollments</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Course.title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.evaUser.userName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.completedLessons)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.finalScore)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.currentScore)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isFinalized)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EnrollmentDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.completionDate)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Course.title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.evaUser.userName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.completedLessons)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.finalScore)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.currentScore)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isFinalized)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.EnrollmentDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.completionDate)
+        </td>
+        <td>
+            @Html.ActionLink("Borrar Inscripcion", "deleteEnrollment", new { id=item.evaCourseEnrollmentID }) |
+            @Ajax.ActionLink("Detalles", "getUserLessonDetailInfo", new { id = item.evaCourseEnrollmentID }, 
+           new AjaxOptions() {
+           HttpMethod= "get", InsertionMode=InsertionMode.Replace, UpdateTargetId="lessonDetail"})
+        </td>
+    </tr>
+}
+
+</table>
+
+@* renders the detail of the selected detail info *@
+
+<div id="lessonDetail">
+
+</div>

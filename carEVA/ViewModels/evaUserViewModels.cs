@@ -23,4 +23,13 @@ namespace carEVA.ViewModels
         public int completedRequiredCourses { get; set; }
         
     }
+
+    //used to send only the user full name and the evaBaseUserID
+    //in the externalLogInController response
+    public class userFullName
+    {
+        public int evaUserID{ get; set; }
+        public string fullName { get; set; }
+    }
+
 }

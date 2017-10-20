@@ -30,7 +30,7 @@ namespace carEVA.Controllers.API
                 currentLessonDetail = db.evaLessonDetails.Find(quizResponse.lessonDetailID);
                 //validate the publickey
                 currentUser = userUtils.userIdFromKey(db, publicKey);
-                if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+                if (currentLessonDetail.courseEnrollment.evaBaseUserID != currentUser)
                 {
                     return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
                 }
@@ -194,9 +194,9 @@ namespace carEVA.Controllers.API
             int enrollmentID = currentLessonDetail.courseEnrollment.evaCourseEnrollmentID;
             //validate the publickey
             int currentUser = userUtils.userIdFromKey(db, quizResponse.publicKey);
-            if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+            if (currentLessonDetail.courseEnrollment.evaBaseUserID != currentUser)
             {
-                return BadRequest("ERROR: la clave publica no es valida para esta evaluacion");
+                return BadRequest("ERROR: la llave publica no es valida para esta evaluacion");
             }
 
             //query the list of questions and its detail for the given lesson
@@ -212,29 +212,36 @@ namespace carEVA.Controllers.API
             bool correct = true;
             int reduceMaxScoreWeight = 0;
 
-            foreach (response responseItem in quizResponse.responses)
+            
+
+            foreach (Question questionItem in questions)
             {
                 //evaluation parameters, initialize as the current response is correct
                 pointsForAnswer = 0;
                 grongAttempt = 0;
                 correct = true;
                 reduceMaxScoreWeight = 0;
-                //get the question info
-                Question questionInfo = questions.Where(q => q.QuestionID == responseItem.questionID).Single();
-                totalLessonPoints = totalLessonPoints + questionInfo.points;
+                //get the the user response for the given question
+                //the parameneter becomes null if the user does not provide an answer
+                response userResponse = null;
+                if (quizResponse.responses.Where(p => p.questionID == questionItem.QuestionID).Count() > 0)
+                {
+                    userResponse = quizResponse.responses.Where(p => p.questionID == questionItem.QuestionID).FirstOrDefault();
+                }
+                totalLessonPoints = totalLessonPoints + questionItem.points;
                 //then, check if there is question detail
-                if (questionDetail.Where(q => q.questionID == responseItem.questionID).Count() == 0)
+                if (questionDetail.Where(q => q.questionID == questionItem.QuestionID).Count() == 0)
                 {
                     //there is no detail, so its the first grade attempt for this question
-                    if (questionInfo.answerOptions.Where(q => q.AnswerID == responseItem.answerID).Single().isCorrect)
+                    if (userResponse!= null && questionItem.answerOptions.Where(q => q.AnswerID == userResponse.answerID).Single().isCorrect)
                     {
                         //the selected anwers for this question is correct
-                        pointsForAnswer = questionInfo.points;
+                        pointsForAnswer = questionItem.points;
                         score = score + (int)pointsForAnswer;
                     }
                     else
                     {
-                        //grong Answer! no points :(
+                        //grong Answer, or the user provided no answer so no points :(
                         pointsForAnswer = 0;
                         grongAttempt = 1;
                         correct = false;
@@ -245,7 +252,7 @@ namespace carEVA.Controllers.API
                     evaAnswerHistory historyItem = new evaAnswerHistory()
                     {
                         submitedDate = DateTime.Now,
-                        selectedAnswerID = responseItem.answerID,
+                        selectedAnswerID = (userResponse == null ? 0:userResponse.answerID),
                         maxScore = 100 - reduceMaxScoreWeight, //percent value
                         isCorrect = correct,
                         score = (int)Math.Ceiling(pointsForAnswer)
@@ -254,8 +261,8 @@ namespace carEVA.Controllers.API
                     evaQuestionDetail newQuestionDetail = new evaQuestionDetail()
                     {
                         evaLessonDetailID = quizResponse.lessonDetailID,
-                        questionID = responseItem.questionID,
-                        lastGradedAnswerID = responseItem.answerID,
+                        questionID = questionItem.QuestionID,
+                        lastGradedAnswerID = (userResponse == null ? 0: userResponse.answerID),
                         isCorrect = correct,
                         totalGrongAttempts = grongAttempt,
                         finalScore = (int)Math.Ceiling(pointsForAnswer),
@@ -267,10 +274,10 @@ namespace carEVA.Controllers.API
                     db.evaQuestionDetails.Add(newQuestionDetail);
                     db.SaveChanges();
                 }
-                else if (questionDetail.Where(q => q.questionID == responseItem.questionID).Count() == 1)
+                else if (questionDetail.Where(q => q.questionID == questionItem.QuestionID).Count() == 1)
                 {
                     //there exist a question detail for this answer.
-                    evaQuestionDetail qDetails = questionDetail.Where(q => q.questionID == responseItem.questionID).FirstOrDefault();
+                    evaQuestionDetail qDetails = questionDetail.Where(q => q.questionID == questionItem.QuestionID).FirstOrDefault();
                     if (qDetails.isCorrect == true) {
                         //the users previously answered correctly
                         //just use the detail information to update the score counter
@@ -284,15 +291,15 @@ namespace carEVA.Controllers.API
                         }
                         
                     }
-                    if (questionInfo.answerOptions.Where(q => q.AnswerID == responseItem.answerID).Single().isCorrect)
+                    if (userResponse != null && questionItem.answerOptions.Where(q => q.AnswerID == userResponse.answerID).Single().isCorrect)
                     {
                         //the selected answer for this question is correct :)
-                        pointsForAnswer = (questionInfo.points * qDetails.currentMaxScore) / 100;
+                        pointsForAnswer = (questionItem.points * qDetails.currentMaxScore) / 100;
                         score = score + (int)Math.Ceiling(pointsForAnswer); //round Up to the highest number
                     }
                     else
                     {
-                        //grong answer, no points :(
+                        //grong answer, or the user provided no answer no points :(
                         pointsForAnswer = 0;
                         grongAttempt = 1;
                         correct = false;
@@ -303,7 +310,7 @@ namespace carEVA.Controllers.API
                     evaAnswerHistory historyItem = new evaAnswerHistory()
                     {
                         submitedDate = DateTime.Now,
-                        selectedAnswerID = responseItem.answerID,
+                        selectedAnswerID = (userResponse == null ? 0 : userResponse.answerID),
                         maxScore = qDetails.currentMaxScore - reduceMaxScoreWeight, //percent value
                         isCorrect = correct,
                         score = (int)Math.Ceiling(pointsForAnswer)
@@ -312,7 +319,7 @@ namespace carEVA.Controllers.API
                     //update the current question detail. 
                     //TODO: what IF the previously graded answer was correct
                     //for now, we just overwrite the result
-                    qDetails.lastGradedAnswerID = responseItem.answerID;
+                    qDetails.lastGradedAnswerID = (userResponse == null ? 0 : userResponse.answerID);
                     qDetails.isCorrect = correct;
                     qDetails.totalGrongAttempts = qDetails.totalGrongAttempts + grongAttempt;
                     qDetails.finalScore = (int)Math.Ceiling(pointsForAnswer);
@@ -329,12 +336,7 @@ namespace carEVA.Controllers.API
                 }
 
             }
-            //a little hack to take into account that an empty set can be received
-            //when the user selects no answer and hits evaluate
-            if (score == 0 && totalLessonPoints == 0) {
-                //this forces to fail the evaluation correctly
-                totalLessonPoints = 10;
-            }
+            
             //IMPORTANT!!! grade the entire quiz to 60% of total points minimum to pass
             enrollmentUtils.updateScoreAndCompletedLessons(db, enrollmentID,
                    (score - currentLessonDetail.currentTotalGrade),

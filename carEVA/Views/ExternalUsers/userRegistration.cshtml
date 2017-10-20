@@ -1,0 +1,90 @@
+﻿@model carEVA.ViewModels.externalUserViewModel
+
+@{
+    ViewBag.Title = "userRegistration";
+}
+
+@section styles {
+    @Styles.Render("~/Content/jqueryUI")
+@* use this style to render the loading animation when jquery UI autocomplete is fetching data *@
+    <style>
+        .ui-autocomplete-loading {
+            background: white url("../../Content/images/ui-anim_basic_16x16.gif") right center no-repeat;
+        }
+    </style>
+}
+
+<h2>Registro Usuario</h2>
+<p>Ingresa los siguientes datos para buscar tu registro en EVA</p>
+<p>Si no encuentras tus datos ponte en contacto con el administrador del sistema</p>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.userID)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.userFullName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @* MVC tranforms  data_auto_complete_url to atribute data-autocomplete-url*@
+                @Html.TextBoxFor(model => model.userFullName, new { data_autocomplete_url = Url.Action("Autocomplete"), @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.userFullName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.documentType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(model => model.documentType, htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.identificationNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.identificationNumber, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.identificationNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Siguiente" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+    @Scripts.Render("~/bundles/jqueryUI");
+
+    <script type="text/javascript" language="javascript">
+        $('*[data-autocomplete-url]').each(function () {
+            var inputReference = $(this);
+            $(this).autocomplete({
+                source: function (request, response) {
+                    var tempUrl = inputReference.data("autocomplete-url");
+                    $.ajax({
+                        url: tempUrl,
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (v, i) {
+                                return { value: v.fullName, ID: v.evaUserID };
+                            })
+                            );
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    $('#userID').val(ui.item.ID);
+                },
+            });
+        });
+</script>
+}

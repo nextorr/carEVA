@@ -1,0 +1,108 @@
+﻿@model carEVA.Models.evaCarDefensoresAgua
+
+@{
+    ViewBag.Title = "Registro completo!";
+}
+
+<h2>Inscripcion Exitosa!!</h2>
+<h2>Sea completado tu registro @Model.fullName</h2>
+<h2>Te encuentras inscrito en @Model.organizationArea.name</h2>
+<p>Ya puedes hacer uso de EVA con el usuario y la contraseña que registraste</p>
+
+<div>
+    <h4>Sea completado tu registro en:</h4>
+    <h4>@Model.organizationArea.name</h4>
+    <h4>@Model.organization.name</h4>
+    <hr />
+    <dl class="dl-horizontal">
+
+        <dt>
+            @Html.DisplayNameFor(model => model.userName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.userName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.fullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.fullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.email)
+        </dd>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isActive)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.institucionEducativa)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.institucionEducativa)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.tipoDocumento)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.tipoDocumento)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.numeroDocumento)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.numeroDocumento)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.edad)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.edad)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.municipio)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.municipio)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gradoEstudio)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gradoEstudio)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

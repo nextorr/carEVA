@@ -1,36 +1,45 @@
-﻿@model IEnumerable<carEVA.Models.Course>
+﻿@model IEnumerable<carEVA.ViewModels.CoursesViewModels>
 
 @{
     ViewBag.Title = "Cursos";
 }
+@if (!ViewBag.isExternal)
+{
+    <h2>Mis Cursos Internos</h2>
+    <p>
+        @Html.ActionLink("Nuevo Curso", "Create")
+    </p>
+}
+else
+{
+    <h2>Mis Cursos Externos</h2>
+    <p>
+        @Html.ActionLink("Nuevo Curso Externo", "Create", new {organizationAreaID = ViewBag.organizationAreaID })
+    </p>
+}
 
-<h2>Catalogo de Cursos</h2>
-
-<p>
-    @Html.ActionLink("Nuevo Curso", "Create")
-</p>
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.title)
+            @Html.DisplayNameFor(model => model.course.title)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.description)
+            @Html.DisplayNameFor(model => model.course.description)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.commitmentDays)
+            @Html.DisplayNameFor(model => model.course.commitmentDays)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.commitmentHoursPerDay)
+            @Html.DisplayNameFor(model => model.course.commitmentHoursPerDay)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.totalQuizes)
+            @Html.DisplayNameFor(model => model.course.totalQuizes)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.totalLessons)
+            @Html.DisplayNameFor(model => model.course.totalLessons)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.totalPoints)
+            @Html.DisplayNameFor(model => model.course.totalPoints)
         </th>
         <th></th>
     </tr>
@@ -38,32 +47,32 @@
 @foreach (var item in Model) {
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.title)
+            @Html.DisplayFor(modelItem => item.course.title)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.description)
+            @Html.DisplayFor(modelItem => item.course.description)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.commitmentDays)
+            @Html.DisplayFor(modelItem => item.course.commitmentDays)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.commitmentHoursPerDay)
+            @Html.DisplayFor(modelItem => item.course.commitmentHoursPerDay)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.totalQuizes)
+            @Html.DisplayFor(modelItem => item.course.totalQuizes)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.totalLessons)
+            @Html.DisplayFor(modelItem => item.course.totalLessons)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.totalPoints)
+            @Html.DisplayFor(modelItem => item.course.totalPoints)
         </td>
         <td>
-            @Html.ActionLink("Editar", "Edit", new { id=item.CourseID }) |
+            @Html.ActionLink("Editar", "Edit", new { id=item.course.CourseID }) |
             @*@Html.ActionLink("Details", "Details", new { id=item.CourseID }) |*@
-            @Html.ActionLink("Eliminar", "Delete", new { id=item.CourseID }) |
-            @Html.ActionLink("Capitulos", "index","chapters", new { courseid = item.CourseID },null) |
-            @Html.ActionLink("Archivos", "index", "file", new { courseid = item.CourseID }, null)
+            @Html.ActionLink("Eliminar", "Delete", new { id=item.course.CourseID }) |
+            @Html.ActionLink("Capitulos", "index","chapters", new { courseid = item.course.CourseID },null) |
+            @Html.ActionLink("Archivos", "index", "file", new { courseid = item.course.CourseID }, null)
             
         </td>
     </tr>

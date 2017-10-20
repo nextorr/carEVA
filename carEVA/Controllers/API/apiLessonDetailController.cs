@@ -48,7 +48,7 @@ namespace carEVA.Controllers.API
             evaCourseEnrollment enrollment;
             try
             {
-                enrollment = db.evaCourseEnrollments.Where(m => m.CourseID == courseID && m.evaUserID == currentUserID)
+                enrollment = db.evaCourseEnrollments.Where(m => m.CourseID == courseID && m.evaBaseUserID == currentUserID)
                 .Include(m => m.lessonDetail).Single();
             }
             catch (InvalidOperationException e)
@@ -125,6 +125,7 @@ namespace carEVA.Controllers.API
             if(dataToSave)
                 db.SaveChanges();
 
+            response = response.OrderBy(p => p.chapter.index).ToList();
             //clean some fileds before storing the result to avoid redundant data to be sent
             //IMPORTANT: do response modifications here, after the data is saved in the database.
             //to avoid model invalidation errors

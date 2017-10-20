@@ -36,6 +36,9 @@ namespace carEVA.Models
         public int totalPoints { get; set; }
         public int evaImageID { get; set; }
         public virtual evaImage image { get; set; }
+        //owner of the course
+        public int evaInstructorID { get; set; }
+        public virtual evaInstructor instructor { get; set; }
         //navigation properties: this allows me to call info from this classes
         //directly inside views or controllers
         public virtual ICollection<Chapter> Chapters { get; set; }

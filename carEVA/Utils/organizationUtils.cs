@@ -105,5 +105,19 @@ namespace carEVA.Utils
             return totalEntitites;
         }
         //---------------------------------------------------------------------------------------------
+        public static int getOrganizationAreaIdFromCode(carEVAContext context, string _areaCode)
+        {
+            int areaID = 0;
+            try
+            {
+                areaID = context.evaOrganizationAreas.Where(c => c.areaCode == _areaCode).FirstOrDefault().evaOrganizationAreaID;
+            }
+            catch (Exception)
+            {
+                return context.evaOrganizationAreas.Where(c => c.areaCode == "1").FirstOrDefault().evaOrganizationAreaID;
+            }
+            
+            return areaID;
+        }
     }
 }

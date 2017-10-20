@@ -13,10 +13,9 @@ using carEVA.Utils;
 
 namespace carEVA.Controllers.API
 {
+    //this class upload the video from the client to the server file system
     public class UploadVideoController : ApiController
     {
-        //get a reference to the media account to save and publish the video
-        private evaMediaServices mMediaService = new evaMediaServices();
 
         // Enable both Get and Post so that our jquery call can send data, and get a status
         [HttpGet]
@@ -25,17 +24,12 @@ namespace carEVA.Controllers.API
         {
             HttpPostedFile httpFile = null;
             string fileFullPath;
-            Uri publishLocation;
             try
             {
                 // Get a reference to the file that our jQuery sent.  Even with multiple files, they will all be on their own request and be the 0 index
                 httpFile = HttpContext.Current.Request.Files[0];
                 //save the file in file system so we can use AMS file upload
                 fileFullPath = fileUtils.saveFileToSystem(httpFile);
-                //upload to AMS the saved file
-                //IAsset fileAsset = mMediaService.UploadFile(fileFullPath, AssetCreationOptions.None);
-                ////and then publish the file so it can be viewed on android
-                //publishLocation = mMediaService.publishAndGetUrl(fileAsset);
             }
             catch (Exception e)
             {

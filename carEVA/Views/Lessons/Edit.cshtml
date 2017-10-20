@@ -4,6 +4,11 @@
     ViewBag.Title = "Editar";
 }
 
+@section Styles {
+    @Styles.Render("~/Content/fileUpload")
+    @Styles.Render("~/Content/evaFileUpload")
+}
+
 <h2>Editar Leccion</h2>
 
 
@@ -35,8 +40,25 @@
         <div class="form-group">
             @Html.LabelFor(model => model.videoURL, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.videoURL, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.videoURL, "", new { @class = "text-danger" })
+
+                <span class="btn btn-link fileinput-button">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Seleccione Video ...</span>
+                    <input type="file" name="file" class="evaImageSelector" accept="video/mp4" />
+                </span>
+
+                <!-- The global progress bar -->
+                <div id="progress" class="progress">
+                    <div class="progress-bar progress-bar-success" style="width: 0%;"></div>
+                </div>
+
+                <div class="files evaSelectedFile"></div>
+
+                <div>
+                    @Html.EditorFor(model => model.videoURL, new { htmlAttributes = new { @class = "form-control evaVideoUrl", @readonly = "readonly" } })
+                    @Html.ValidationMessageFor(model => model.videoURL, "", new { @class = "text-danger" })
+                </div>
+
             </div>
         </div>
 
@@ -70,4 +92,7 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryUI")
+    @Scripts.Render("~/bundles/fileUpload")
+    @Scripts.Render("~/bundles/evaVideoUpload")
 }

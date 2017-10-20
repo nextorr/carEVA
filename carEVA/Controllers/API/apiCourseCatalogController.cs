@@ -17,17 +17,24 @@ namespace carEVA.Controllers.API
 {
     public class courseCatalogController : ApiController
     {
-        private carEVAContext db = new carEVAContext();
+        private carEVAContext db; 
+        public courseCatalogController()
+        {
+            db=new carEVAContext();
+        }
 
+        public courseCatalogController( carEVAContext context)
+        {
+            db = context;
+        }
         // GET: api/courseCatalog
         [ResponseType(typeof(evaOrganizationCourse))]
         public IHttpActionResult GetCourses(string publicKey)
         {
-            //use this parameter if you dont want all the children to be populated
             int orgID;
             int userId;
 
-
+            //use this parameter if you dont want all the children to be populated
             db.Configuration.ProxyCreationEnabled = false;
             try
             {
@@ -43,7 +50,7 @@ namespace carEVA.Controllers.API
             }
 
             //force the execution of the query here so the loops dont fail (deffered execution)
-            var userEnrollments = db.evaCourseEnrollments.Where(p => p.evaUserID == userId).ToList();
+            var userEnrollments = db.evaCourseEnrollments.Where(p => p.evaBaseUserID == userId).ToList();
             var orgCourses = db.evaOrganizationCourses.Where(p => p.evaOrganizationID == orgID).Include(m => m.course).ToList();
 
             foreach (evaOrganizationCourse item in orgCourses)
@@ -52,8 +59,10 @@ namespace carEVA.Controllers.API
                 {
                     if(enrol.CourseID == item.courseID)
                     {
+                        //this clears the user field so it is not sent on the response
                         enrol.evaUser = null;
                         //the user is enrolled in this course
+                        //this writes the enrollment infor to be sent in the service
                         item.course.enrollments.Add(enrol);
                     }
                 }

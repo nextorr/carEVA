@@ -13,7 +13,8 @@ namespace carEVA
                         "~/Scripts/jquery-{version}.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
-                        "~/Scripts/jquery.validate*"));
+                        "~/Scripts/jquery.validate*",
+                        "~/Scripts/jquery.unobtrusive-ajax.min.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryUI").Include(
                         "~/Scripts/jquery-ui-{version}.js"));
@@ -49,6 +50,11 @@ namespace carEVA
             //bundle custom styles for the file upload plugin
             bundles.Add(new StyleBundle("~/Content/evaFileUpload").Include(
                       "~/Content/eva/evaFileUpload.css"));
+
+            //bundle custom styles for the jquery UI plugin
+            bundles.Add(new StyleBundle("~/Content/jqueryUI").Include(
+                      "~/Content/themes/base/jquery-ui.css"));
+
         }
     }
 }

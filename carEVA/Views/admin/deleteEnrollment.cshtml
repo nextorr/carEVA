@@ -1,0 +1,88 @@
+﻿@model carEVA.Models.evaCourseEnrollment
+
+@{
+    ViewBag.Title = "deleteEnrollment";
+}
+
+<h2>deleteEnrollment</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>evaCourseEnrollment</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Course.title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Course.title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.evaUser.userName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.evaUser.userName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completedLessons)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completedLessons)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.finalScore)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.finalScore)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.currentScore)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.currentScore)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isFinalized)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isFinalized)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EnrollmentDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.EnrollmentDate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completionDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completionDate)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("cancelar", "userDataAdmin")
+        </div>
+    }
+</div>

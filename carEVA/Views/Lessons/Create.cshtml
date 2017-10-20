@@ -44,7 +44,7 @@
                 <span class="btn btn-link fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Seleccione Video ...</span>
-                    <input type="file" name="file" class="moviImageSelector" accept="video/mp4" />
+                    <input type="file" name="file" class="evaImageSelector" accept="video/mp4" />
                 </span>
 
                 <!-- The global progress bar -->
@@ -52,7 +52,7 @@
                     <div class="progress-bar progress-bar-success" style="width: 0%;"></div>
                 </div>
 
-                <div class="files moviSelectedFile"></div>
+                <div class="files evaSelectedFile"></div>
 
                 <div >
                     @Html.EditorFor(model => model.videoURL, new { htmlAttributes = new { @class = "form-control evaVideoUrl", @readonly = "readonly" } })
@@ -60,9 +60,6 @@
                 </div>
 
             </div>
-
-            
-
         </div>
 
         <div class="form-group">

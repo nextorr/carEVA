@@ -34,7 +34,7 @@ namespace carEVA
             {
                 this.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
                 this.SerializerSettings.Formatting = Formatting.Indented;
-                //ignore loops in the serializer options
+                //ignore loops in the serializer options, this ignores circular references in the code.
                 this.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             }
 

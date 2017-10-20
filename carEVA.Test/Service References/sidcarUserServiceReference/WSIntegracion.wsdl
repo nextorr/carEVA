@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="ObtenerResumenRadicado">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="numeroRadicado" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObtenerResumenRadicadoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ObtenerResumenRadicadoResult" type="tns:ResumenRadicado" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ResumenRadicado">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="IDRadicado" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaRadicado" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="IDTipoDocumento" type="s:unsignedByte" />
+          <s:element minOccurs="0" maxOccurs="1" name="Tramite" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Tema" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Remitente" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Municipio" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Asunto" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Entidad" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Persona" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Vereda" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OficinaRadica" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TipoDocumento" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UrlPDF" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="ObtenerResumenDocumento">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="idDocumento" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ObtenerResumenDocumentoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ObtenerResumenDocumentoResult" type="tns:ResumenDocumento" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ResumenDocumento">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="IDDocumento" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="IDTipoDocumento" type="s:unsignedByte" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaCreacion" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Asunto" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Estado" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Destinatarios" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="TipoDocumento" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OficinaElabora" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UsuarioElabora" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UrlPDF" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="AsociarRadicado">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="idOrigenSistema" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="numeroRadicado" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="identificador" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="anioIdentificador" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="tipoIdentificador" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AsociarRadicadoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AsociarRadicadoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EliminarRadicadoAsociado">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="idOrigenSistema" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="numeroRadicado" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="identificador" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="anioIdentificador" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="tipoIdentificador" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EliminarRadicadoAsociadoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EliminarRadicadoAsociadoResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AgregarDestinosDocumentoDigital">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="idSistemaOrigen" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="xmlDestinos" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AgregarDestinosDocumentoDigitalResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AgregarDestinosDocumentoDigitalResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AgregarDestinosDocumentoDigital2">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="idSistemaOrigen" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="xmlDestinos">
+              <s:complexType mixed="true">
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AgregarDestinosDocumentoDigital2Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AgregarDestinosDocumentoDigital2Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SignInJson">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="login" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="idSistemaOrigen" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SignInJsonResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SignInJsonResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ListaOficinasActivas">
+        <s:complexType />
+      </s:element>
+      <s:element name="ListaOficinasActivasResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ListaOficinasActivasResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SignIn">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="login" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SignInResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="SignInResult" type="tns:WSUsuario" />
+            <s:element minOccurs="0" maxOccurs="1" name="mensajeWSError" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="WSUsuario">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="IDUsuario" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="IDOficinaActual" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="OficinaActual" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Login" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Nombre" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="EMail" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UsuarioCreacion" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Identificacion" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="TipoVinculacion" type="s:unsignedByte" />
+          <s:element minOccurs="0" maxOccurs="1" name="NumeroContrato" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaInicioContrato" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="FechaFinContrato" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="Sexo" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IDJefeInmediato" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="Activo" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="MsngRespuesta" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="ObtenerResumenRadicadoSoapIn">
+    <wsdl:part name="parameters" element="tns:ObtenerResumenRadicado" />
+  </wsdl:message>
+  <wsdl:message name="ObtenerResumenRadicadoSoapOut">
+    <wsdl:part name="parameters" element="tns:ObtenerResumenRadicadoResponse" />
+  </wsdl:message>
+  <wsdl:message name="ObtenerResumenDocumentoSoapIn">
+    <wsdl:part name="parameters" element="tns:ObtenerResumenDocumento" />
+  </wsdl:message>
+  <wsdl:message name="ObtenerResumenDocumentoSoapOut">
+    <wsdl:part name="parameters" element="tns:ObtenerResumenDocumentoResponse" />
+  </wsdl:message>
+  <wsdl:message name="AsociarRadicadoSoapIn">
+    <wsdl:part name="parameters" element="tns:AsociarRadicado" />
+  </wsdl:message>
+  <wsdl:message name="AsociarRadicadoSoapOut">
+    <wsdl:part name="parameters" element="tns:AsociarRadicadoResponse" />
+  </wsdl:message>
+  <wsdl:message name="EliminarRadicadoAsociadoSoapIn">
+    <wsdl:part name="parameters" element="tns:EliminarRadicadoAsociado" />
+  </wsdl:message>
+  <wsdl:message name="EliminarRadicadoAsociadoSoapOut">
+    <wsdl:part name="parameters" element="tns:EliminarRadicadoAsociadoResponse" />
+  </wsdl:message>
+  <wsdl:message name="AgregarDestinosDocumentoDigitalSoapIn">
+    <wsdl:part name="parameters" element="tns:AgregarDestinosDocumentoDigital" />
+  </wsdl:message>
+  <wsdl:message name="AgregarDestinosDocumentoDigitalSoapOut">
+    <wsdl:part name="parameters" element="tns:AgregarDestinosDocumentoDigitalResponse" />
+  </wsdl:message>
+  <wsdl:message name="AgregarDestinosDocumentoDigital2SoapIn">
+    <wsdl:part name="parameters" element="tns:AgregarDestinosDocumentoDigital2" />
+  </wsdl:message>
+  <wsdl:message name="AgregarDestinosDocumentoDigital2SoapOut">
+    <wsdl:part name="parameters" element="tns:AgregarDestinosDocumentoDigital2Response" />
+  </wsdl:message>
+  <wsdl:message name="SignInJsonSoapIn">
+    <wsdl:part name="parameters" element="tns:SignInJson" />
+  </wsdl:message>
+  <wsdl:message name="SignInJsonSoapOut">
+    <wsdl:part name="parameters" element="tns:SignInJsonResponse" />
+  </wsdl:message>
+  <wsdl:message name="ListaOficinasActivasSoapIn">
+    <wsdl:part name="parameters" element="tns:ListaOficinasActivas" />
+  </wsdl:message>
+  <wsdl:message name="ListaOficinasActivasSoapOut">
+    <wsdl:part name="parameters" element="tns:ListaOficinasActivasResponse" />
+  </wsdl:message>
+  <wsdl:message name="SignInSoapIn">
+    <wsdl:part name="parameters" element="tns:SignIn" />
+  </wsdl:message>
+  <wsdl:message name="SignInSoapOut">
+    <wsdl:part name="parameters" element="tns:SignInResponse" />
+  </wsdl:message>
+  <wsdl:portType name="WSIntegracionSoap">
+    <wsdl:operation name="ObtenerResumenRadicado">
+      <wsdl:input message="tns:ObtenerResumenRadicadoSoapIn" />
+      <wsdl:output message="tns:ObtenerResumenRadicadoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerResumenDocumento">
+      <wsdl:input message="tns:ObtenerResumenDocumentoSoapIn" />
+      <wsdl:output message="tns:ObtenerResumenDocumentoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AsociarRadicado">
+      <wsdl:input message="tns:AsociarRadicadoSoapIn" />
+      <wsdl:output message="tns:AsociarRadicadoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EliminarRadicadoAsociado">
+      <wsdl:input message="tns:EliminarRadicadoAsociadoSoapIn" />
+      <wsdl:output message="tns:EliminarRadicadoAsociadoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital">
+      <wsdl:input message="tns:AgregarDestinosDocumentoDigitalSoapIn" />
+      <wsdl:output message="tns:AgregarDestinosDocumentoDigitalSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital2">
+      <wsdl:input message="tns:AgregarDestinosDocumentoDigital2SoapIn" />
+      <wsdl:output message="tns:AgregarDestinosDocumentoDigital2SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SignInJson">
+      <wsdl:input message="tns:SignInJsonSoapIn" />
+      <wsdl:output message="tns:SignInJsonSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ListaOficinasActivas">
+      <wsdl:input message="tns:ListaOficinasActivasSoapIn" />
+      <wsdl:output message="tns:ListaOficinasActivasSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SignIn">
+      <wsdl:input message="tns:SignInSoapIn" />
+      <wsdl:output message="tns:SignInSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WSIntegracionSoap" type="tns:WSIntegracionSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ObtenerResumenRadicado">
+      <soap:operation soapAction="http://tempuri.org/ObtenerResumenRadicado" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerResumenDocumento">
+      <soap:operation soapAction="http://tempuri.org/ObtenerResumenDocumento" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AsociarRadicado">
+      <soap:operation soapAction="http://tempuri.org/AsociarRadicado" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EliminarRadicadoAsociado">
+      <soap:operation soapAction="http://tempuri.org/EliminarRadicadoAsociado" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital">
+      <soap:operation soapAction="http://tempuri.org/AgregarDestinosDocumentoDigital" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital2">
+      <soap:operation soapAction="http://tempuri.org/AgregarDestinosDocumentoDigital2" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SignInJson">
+      <soap:operation soapAction="http://tempuri.org/SignInJson" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListaOficinasActivas">
+      <soap:operation soapAction="http://tempuri.org/ListaOficinasActivas" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SignIn">
+      <soap:operation soapAction="http://tempuri.org/SignIn" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="WSIntegracionSoap12" type="tns:WSIntegracionSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="ObtenerResumenRadicado">
+      <soap12:operation soapAction="http://tempuri.org/ObtenerResumenRadicado" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ObtenerResumenDocumento">
+      <soap12:operation soapAction="http://tempuri.org/ObtenerResumenDocumento" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AsociarRadicado">
+      <soap12:operation soapAction="http://tempuri.org/AsociarRadicado" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EliminarRadicadoAsociado">
+      <soap12:operation soapAction="http://tempuri.org/EliminarRadicadoAsociado" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital">
+      <soap12:operation soapAction="http://tempuri.org/AgregarDestinosDocumentoDigital" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AgregarDestinosDocumentoDigital2">
+      <soap12:operation soapAction="http://tempuri.org/AgregarDestinosDocumentoDigital2" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SignInJson">
+      <soap12:operation soapAction="http://tempuri.org/SignInJson" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ListaOficinasActivas">
+      <soap12:operation soapAction="http://tempuri.org/ListaOficinasActivas" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SignIn">
+      <soap12:operation soapAction="http://tempuri.org/SignIn" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WSIntegracion">
+    <wsdl:port name="WSIntegracionSoap" binding="tns:WSIntegracionSoap">
+      <soap:address location="https://sidcar.car.gov.co/WSIntegracion.asmx" />
+    </wsdl:port>
+    <wsdl:port name="WSIntegracionSoap12" binding="tns:WSIntegracionSoap12">
+      <soap12:address location="https://sidcar.car.gov.co/WSIntegracion.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

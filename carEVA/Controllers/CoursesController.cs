@@ -7,22 +7,68 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using carEVA.Models;
+using carEVA.ViewModels;
 using Microsoft.WindowsAzure.Storage;
 using System.Configuration;
 using Microsoft.WindowsAzure.Storage.Blob;
 
 using carEVA.Utils;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using System.Threading.Tasks;
 
 namespace carEVA.Controllers
 {
+    [Authorize]
     public class CoursesController : Controller
     {
         private carEVAContext db = new carEVAContext();
+        private ApplicationDbContext appContext;
+        private UserManager<ApplicationUser> userManager;
 
-        // GET: Courses
-        public ActionResult Index()
+        //initialization constructor
+        public CoursesController()
         {
-            return View(db.Courses.ToList());
+            appContext = new ApplicationDbContext();
+            userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(appContext));
+        }
+        // GET: Courses from the logged instructor
+        [Authorize(Roles = evaRoles.Instructor)]
+        public async Task<ActionResult> Index(int? organizationAreaID)
+        {
+            //use this to set up the view
+            ViewBag.isExternal = false;
+            int instructorID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
+            //USAGE: the course query depends on the parameters that are sent to the controller.
+            //at the end we need to filter the courses to show only those of the logged in instructor
+            List<Course> courses;
+            IEnumerable<Course> courseQuery;
+            if (organizationAreaID != null)
+            {
+                courseQuery = db.evaOrganizationAreas.Find(organizationAreaID).organizationCourses.Select(x => x.course);
+                ViewBag.isExternal = db.evaOrganizationAreas.Find(organizationAreaID).isExternal;
+                ViewBag.organizationAreaID = organizationAreaID;
+            }
+            else
+            {
+                //return only internal courses
+                courseQuery = db.evaOrganizationAreas.Where(o => o.isExternal == false)
+                    .SelectMany(m => m.organizationCourses).Select(c =>c.course);
+            }
+            courses = courseQuery.Where(c => c.evaInstructorID == instructorID).ToList();
+            //construct the view model to see all the relevant data
+            List<CoursesViewModels> courseVmList = new List<CoursesViewModels>();
+            foreach (Course item in courses)
+            {
+                int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+                CoursesViewModels model = new CoursesViewModels()
+                {
+                    course = item,
+                    organizationInfo = item.organizationCourse.Where(org => org.evaOrganizationID == orgID).FirstOrDefault()
+                };
+                courseVmList.Add(model);
+            }
+            return View(courseVmList);
         }
 
         // GET: Courses/Details/5
@@ -41,11 +87,28 @@ namespace carEVA.Controllers
         }
 
         // GET: Courses/Create
-        public ActionResult Create()
+        public ActionResult Create(int? organizationAreaID)
         {
             //populate the list of available areas for the course
-            //TODO: the dafault value is the organization of the logged user
-            ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name");
+            //what defines the course is external is the area of origin of the course
+            ViewBag.isExternal = false;
+            evaOrganizationArea currentArea;
+            if (organizationAreaID != null)
+            {
+                //as sept 2017 to create an external area the controller 
+                //must be called witha organization areaID
+                currentArea = db.evaOrganizationAreas.Find(organizationAreaID);
+                ViewBag.isExternal = currentArea.isExternal;
+                ViewBag.originAreaID = new SelectList(new evaOrganizationArea[] {currentArea}
+                    , "evaOrganizationAreaID", "name", organizationAreaID);
+            }
+            else
+            {
+                currentArea = userUtils.areaFromAspIdentity(db, User.Identity.GetUserId());
+                ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas
+                    , "evaOrganizationAreaID", "name", currentArea.evaOrganizationAreaID);
+            }
+            
             return View();
         }
 
@@ -54,7 +117,8 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CourseID,title,description, commitmentDays, commitmentHoursPerDay")] Course course, DateTime creationDate, string originAreaID, bool required, DateTime? deadline)
+        public async Task<ActionResult> Create([Bind(Include = "CourseID,title,description,commitmentDays,commitmentHoursPerDay", Prefix ="course")] Course course
+            ,[Bind(Include = "evaOrganizationCourseID,creationDate,required,deadline, originAreaID", Prefix ="organizationInfo")] evaOrganizationCourse orgCourse)
         {
             if (ModelState.IsValid)
             {
@@ -68,93 +132,76 @@ namespace carEVA.Controllers
                 //TODO: this a default image, give the option lo load 
                 //a specific image from the same form.
                 course.evaImageID = 1;
-
-                db.Courses.Add(course);
-                //save changes here because we need the courseID on the organization registration
-                db.SaveChanges();
-
-                //update the organization course related information
-                evaOrganizationCourse organizationCourse = new evaOrganizationCourse()
+                //associate the current logged user
+                //and the organization course structure
+                try
                 {
-                    //TODO: here is the organization of the logged user
-                    // 1 is the default for CAR.
-                    evaOrganizationID = 1,
-                    courseID = course.CourseID,
-                    originAreaID = int.Parse(originAreaID),
-                    creationDate = DateTime.Now,
-                    required = required,
-                    deadline = deadline
-                };
-
-                if(organizationUtils.incrementCourseCounter(db, organizationCourse.evaOrganizationID, organizationCourse.required) != 1)
+                    course.evaInstructorID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
+                    //some default values for the organization course
+                    orgCourse.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+                    course.organizationCourse = new List<evaOrganizationCourse>() {orgCourse};
+                    db.Courses.Add(course);
+                }
+                catch (Exception e)
+                {
+                    evaLogUtils.logErrorMessage("invalid model", course, e, 
+                   this.ToString(), nameof(this.Create));
+                }
+                //update the counters
+                if (organizationUtils.incrementCourseCounter(db, orgCourse.evaOrganizationID, orgCourse.required) != 1)
                 {
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar la organizacion para actualizar contadores");
                 }
 
-                db.evaOrganizationCourses.Add(organizationCourse);
                 db.SaveChanges();
-                
-                return RedirectToAction("Index");
-            }
 
-            //TODO: investigate a way of returnig an error message
-            //IE the case where the controller receives null numbers
-            return View(course);
+                //redirect back according to the external course definition
+                if (!db.evaOrganizationAreas.Find(orgCourse.originAreaID).isExternal)
+                    return RedirectToAction("Index");
+                else
+                    return RedirectToAction("Index", new { organizationAreaID = orgCourse.originAreaID });
+            }
+            else
+            {
+                evaLogUtils.logErrorMessage("invalid model",
+                    this.ToString(), nameof(this.Create));
+            }
+            //we end up here if there are imvalid parameters or the binding fails
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
         // GET: Courses/Edit/5
-        public ActionResult Edit(int? id)
+        public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            CoursesViewModels courseViewModel = new CoursesViewModels();
             Course course = db.Courses.Find(id);
-            
-            //even if courses.organizations is a collection, we are using it as single value, so this is the best method
-            evaOrganizationCourse organizationCourse;
-            var query = db.evaOrganizationCourses.Where(s => s.evaOrganizationID == 1 && s.courseID == course.CourseID);
-            //this information is sent to the view, if there is more than one result and exception will be thrown
-            course.organizationCourse = query.ToList();
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+
+            if (course == null || course.organizationCourse == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.NotFound);
+            }
             try
             {
-                organizationCourse = query.Single();
+                courseViewModel.course = course;
+                courseViewModel.organizationInfo = course.organizationCourse.Where(m => m.evaOrganizationID == orgID).Single();
             }
-            catch (System.InvalidOperationException)
+            catch (Exception e)
             {
-                if (query.Count() != 0)
-                {
-                    //if we end up here the query return more tha one resutl
-                    //since this is a mayor incosistency throw an exception
-                    throw (new Exception("Data model inconsistency, contact support for more information"));
-                }
-                else
-                {
-                    //if the result is empty explicitly make organization course null
-                    organizationCourse = null;
-                }
+                string ErrorMessage = "Model incosistency, more than one orgCourse per Organization";
+                evaLogUtils.logErrorMessage(ErrorMessage, course, e, this.ToString(), nameof(this.Edit));
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError, ErrorMessage);
             }
 
-            if (organizationCourse == null)
-            {
-                //empty organizationCourse association.
-                //this is only valid on development
-                //TODO: in production log an error here as this is an incosistency in the data model
-                //the course must always be created with a area association
-                ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name");
-            }
-            else
-            {
-                ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name",
-                    organizationCourse.originAreaID);
-            }
-            
-            
-            if (course == null)
-            {
-                return HttpNotFound();
-            }
-            return View(course);
+            //the areas dropdown list
+            ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas, "evaOrganizationAreaID", "name",
+                    courseViewModel.organizationInfo.originAreaID);
+
+            return View(courseViewModel);
         }
 
         // POST: Courses/Edit/5
@@ -162,34 +209,25 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CourseID,title,description,commitmentDays,commitmentHoursPerDay,totalQuizes,totalLessons,evaImageID")] Course course, string originAreaID, bool required, DateTime? deadline)
+        public ActionResult Edit([Bind(Include = "CourseID,title,description,commitmentDays,commitmentHoursPerDay,totalQuizes,totalLessons,evaImageID, evaInstructorID", Prefix ="course")] Course course
+            ,[Bind(Include = "evaOrganizationCourseID, creationDate, originAreaID, required, deadline, evaOrganizationID, courseID", Prefix ="organizationInfo")] evaOrganizationCourse orgCourse)
         {
             //IMPORTANT NOTE: bind totalQuizes totalLessons evaImageID and any other fied that is not editable
             //this because if we dont bind then the model set this values as null in the database, and thats an incosistency
             if (ModelState.IsValid)
             {
                 course.commitmentHoursTotal = course.commitmentDays * course.commitmentHoursPerDay;
-                //the evaOrganizationID comes from the logged user information
-                //update the payload information
-                evaOrganizationCourse organizationCourse;
-                try
-                {
-                    organizationCourse = db.evaOrganizationCourses.Single(s => s.evaOrganizationID == 1 && s.courseID == course.CourseID);
-                }
-                catch (Exception)
-                {
-                    //TODO: this is a inconsistency in the model, log this information and inform the user
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "the is an incosistency in the model, contact support CourseID: " + course.CourseID.ToString());
-                }
-                organizationCourse.originAreaID = int.Parse(originAreaID);
-                organizationCourse.required = required;
-                organizationCourse.deadline = deadline;
                 db.Entry(course).State = EntityState.Modified;
-                db.Entry(organizationCourse).State = EntityState.Modified;
+                db.Entry(orgCourse).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+
+                if (!db.evaOrganizationAreas.Find(orgCourse.originAreaID).isExternal)
+                    return RedirectToAction("Index");
+                else
+                    return RedirectToAction("Index", new { organizationAreaID = orgCourse.originAreaID });
             }
-            return View(course);
+            //we end up here if there are imvalid parameters or the binding fails
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
         // GET: Courses/Delete/5
@@ -256,7 +294,8 @@ namespace carEVA.Controllers
             //TODO: make sure that we always store the courseID, verify this in the creation of the entry in the file controller
             db.Files.RemoveRange(db.Files.Where(f => f.courseID == id));
 
-
+            //the FK_dbo.evaOrganizationCourses_dbo.Courses_courseID has cascade delelte enabled
+            //so deleting the course will delete the organization course.
             db.Courses.Remove(course);
             db.SaveChanges();
             return RedirectToAction("Index");

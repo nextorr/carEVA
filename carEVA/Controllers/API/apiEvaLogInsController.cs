@@ -13,18 +13,27 @@ using carEVA.Models;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
 using carEVA.Utils;
 using carEVA.ViewModels;
+using System.Web.Mvc;
+using System.Web;
+using Microsoft.Owin.Security.DataProtection;
 
 namespace carEVA.Controllers.API
 {
     public class evaLogInsController : ApiController
     {
-        private carEVAContext db = new carEVAContext();
-        private sidcarUserServiceReference.WSIntegracionSoapClient sidcarProxy = new sidcarUserServiceReference.WSIntegracionSoapClient();
-        private UserManager<ApplicationUser> manager = new UserManager<ApplicationUser>
-            (new UserStore<ApplicationUser>(new ApplicationDbContext()));
+        private carEVAContext db;
+        public evaLogInsController()
+        {
+            db = new carEVAContext();
+        }
 
+        public evaLogInsController(carEVAContext context)
+        {
+            db = context;
+        }
         // GET: api/evalogIns
         public IHttpActionResult GetevaLogIns()
         {
@@ -37,47 +46,13 @@ namespace carEVA.Controllers.API
         [ResponseType(typeof(evaLogIn))]
         public IHttpActionResult GetevaLogIn(int id)
         {
-            evaLogIn evaLogIn = db.evaLogIns.Find(id);
-            if (evaLogIn == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(evaLogIn);
+            return NotFound();
         }
 
         // PUT: api/evalogIns/5
         [ResponseType(typeof(void))]
         public IHttpActionResult PutevaLogIn(int id, evaLogIn evaLogIn)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != evaLogIn.evaLogInID)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(evaLogIn).State = EntityState.Modified;
-
-            try
-            {
-                db.SaveChanges();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!evaLogInExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return StatusCode(HttpStatusCode.NoContent);
         }
 
@@ -96,146 +71,58 @@ namespace carEVA.Controllers.API
                     this.ToString(), nameof(this.PostevaLogIn));
                 return BadRequest("No information received");
             }
-
-
-            sidcarUserServiceReference.SignInJsonResponse response = await sidcarProxy.SignInJsonAsync(evaLogIn.user, evaLogIn.passKey, "EVA");
-            //validate the response from the server
-            //According to specification if the query is invalid the service will send an error
-            if (response.Body.SignInJsonResult.StartsWith("ERROR"))
+            if (!evaLogIn.containsValidInfo())
             {
-                evaLogUtils.logErrorMessage("Invalid service Query, SIDCAR service responded with " + response.Body.SignInJsonResult,
+                evaLogUtils.logErrorMessage("No user domain sent at log in",
                     this.ToString(), nameof(this.PostevaLogIn));
-                return BadRequest("invalid query");
+                return BadRequest("Bad formating, No user domain received");
             }
-            //here the response is OK to parse
-            JObject jsonResult = JObject.Parse(response.Body.SignInJsonResult);
-            //check if the response is parsed correctly
-            if (jsonResult == null || !jsonResult.HasValues)
+
+            evaSignInManager evaManager = new evaSignInManager(db
+                , HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>());
+            evaSignInResult authResult = await evaManager.signInUser(evaLogIn);
+            switch (authResult)
             {
-                string error = "Parsing SIDCAR response failed";
-                evaLogUtils.logErrorMessage(error + " SIDCAR service responded with " + response.Body.SignInJsonResult,
-                    this.ToString(), nameof(this.PostevaLogIn));
-                return BadRequest(error);
-                //return InternalServerError(new Exception("sidcar negotiation failed"));
-            }
-            string serviceMessage = (string)jsonResult["MsngRespuesta"];
-            //According to specification, the service returns in MsngRespuesta its status on the login
-            if (!serviceMessage.StartsWith("OK"))
-            {
-                string error = "Access denied, invalid user or password";
-                evaLogUtils.logErrorMessage(error + " by user:  " + evaLogIn.user,
-                    this.ToString(), nameof(this.PostevaLogIn));
-                return BadRequest(error);
-            }
-            //the parsed response is valid from here.
-
-            evaUser newUser = new evaUser
-            {
-                userName = (string)(jsonResult["Login"]) + "@car.gov.co",
-                fullName = (string)jsonResult["Nombre"],
-                email = (string)jsonResult["EMail"],
-                gender = (string)jsonResult["Sexo"],
-                areaCar = (string)jsonResult["IDOficinaActual"],
-                isActive = (bool)jsonResult["Activo"], 
-                totalEnrollments = 0,
-                completedCatalogCourses = 0,
-                completedRequiredCourses = 0,
-                evaOrganizationID = 1
-
-            };
-
-            ApplicationUser aspnetUser = new ApplicationUser { UserName = newUser.userName, Email = newUser.email };
-            var result = await manager.CreateAsync(aspnetUser, evaLogIn.passKey);
-            if (result.Succeeded)
-            {
-                //its a new user
-                newUser.aspnetUserID = aspnetUser.Id;
-                //assign a new public key to the user
-                newUser.publicKey = Guid.NewGuid().ToString();
-                //adapt the eva log in information to return the public key
-                evaLogIn.passKey = newUser.publicKey;
-                evaLogIn.user = newUser.userName;
-                //dont stonre anything on the eva log in table, we use it just as a functional view, 
-                //but on the data side its just reduntant
-                //db.evaLogIns.Add(evaLogIn);
-                db.evaUsers.Add(newUser);
-                //db.SaveChanges();
-                
-
-                evaLogUtils.logInfoMessage("created " + newUser.userName +
-                        " in ASP and eva log ins",
-                        this.ToString(), nameof(this.PostevaLogIn));
-
-                //return CreatedAtRoute("DefaultApi", new { id = evaLogIn.evaLogInID }, evaLogIn);
-            }
-            else
-            {
-                //its an existing user, update its public key
-                string newPublicKey = Guid.NewGuid().ToString();
-                var originalUser = db.evaUsers.Where(l => l.userName == newUser.userName).FirstOrDefault();
-                if (originalUser != null)
-                {
-                    originalUser.publicKey = newPublicKey;
-                    evaLogIn.passKey = originalUser.publicKey;
-                    evaLogIn.user = originalUser.userName;
-
-                    evaLogUtils.logInfoMessage("renewed Public key for user: " + newUser.userName,
-                        this.ToString(), nameof(this.PostevaLogIn));
-
-                }
-                else
-                {
-                    //this must not happend, as its an inconsistency, 
-                    //the user exist in asp logins but not in the user eva model
-                    //but still, if this happens add the user log in
-                    evaLogUtils.logWarningMessage("model inconsistency, user " + newUser.userName +
-                        " Exist in ASP logins but not on evaLogIns",
-                        this.ToString(), nameof(this.PostevaLogIn));
-
-                    evaLogIn.passKey = newPublicKey;
-                    evaLogIn.user = newUser.userName;
-                    //db.evaLogIns.Add(evaLogIn);
-                    newUser.publicKey = newPublicKey;
-                    newUser.aspnetUserID = aspnetUser.Id;
-                    db.evaUsers.Add(newUser);
-
-                }
+                case evaSignInResult.Success:
+                    //break inmediatly so it does not check for other conditions
+                    break;
+                case evaSignInResult.LockedOut:
+                    return BadRequest("the Account is locked, try again later");
+                case evaSignInResult.RequiresVerification:
+                    return BadRequest("the Account is not verifyed");
+                case evaSignInResult.Failure:
+                    return BadRequest("Invalid user or Password");
+                case evaSignInResult.FailedCreateFromInconsistency:
+                    return BadRequest("Sistem error trying to authenticate");
+                case evaSignInResult.FailedToUpdateAspPassword:
+                    return BadRequest("Sistem error trying to authenticate");
+                default:
+                    return BadRequest("General system error");
             }
 
             try
             {
+                //creates a new user or updates its public key
                 await db.SaveChangesAsync();
             }
             catch (Exception e)
             {
                 //report the service client that the key they are using is invalid.
                 evaLogUtils.logErrorMessage("cannot create eva user ",
-                    newUser.userName, e, this.ToString(), nameof(this.GetevaLogIn));
+                    evaLogIn.user, e, this.ToString(), nameof(this.GetevaLogIn));
                 return BadRequest("ERROR : 400, cannot create eva user");
             }
 
-
-            //this piece is used to delete the first record on the aspnetuser table
-            //ApplicationUser aspnetUser = manager.Users.First();
-            //var result = await manager.DeleteAsync(aspnetUser);
-
-            return CreatedAtRoute("DefaultApi", new { id = evaLogIn.evaLogInID }, evaLogIn);
+            //here we are ignoring the route value
+            evaLogIn.passKey = evaManager.publicKey;
+            //TODO: see the interactions with this api and check if we can change this
+            return CreatedAtRoute("DefaultApi", new { id = 1 }, evaLogIn);
         }
-
         // DELETE: api/evalogIns/5
         [ResponseType(typeof(evaLogIn))]
         public IHttpActionResult DeleteevaLogIn(int id)
         {
-            evaLogIn evaLogIn = db.evaLogIns.Find(id);
-            if (evaLogIn == null)
-            {
-                return NotFound();
-            }
-
-            db.evaLogIns.Remove(evaLogIn);
-            db.SaveChanges();
-
-            return Ok(evaLogIn);
+            return NotFound();
         }
 
         protected override void Dispose(bool disposing)
@@ -245,15 +132,6 @@ namespace carEVA.Controllers.API
                 db.Dispose();
             }
             base.Dispose(disposing);
-        }
-
-        private bool evaLogInExists(int id)
-        {
-            return db.evaLogIns.Count(e => e.evaLogInID == id) > 0;
-        }
-        private bool evaLogInExists(string login)
-        {
-            return db.evaLogIns.Count(e => e.user == login) > 0;
         }
     }
 }

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<carEVA.Models.evaAnswerHistory>
+
+<h2>Answer History</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.questionDetail.evaQuestionDetailID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.submitedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.selectedAnswerID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.maxScore)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isCorrect)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.score)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.questionDetail.evaQuestionDetailID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.submitedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.selectedAnswerID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.maxScore)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isCorrect)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.score)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.evaAnswerHistoryID })
+        </td>
+    </tr>
+}
+
+</table>

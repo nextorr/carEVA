@@ -1,11 +1,20 @@
-﻿@model carEVA.Models.Course
+﻿@model carEVA.ViewModels.CoursesViewModels
 
 @{
     ViewBag.Title = "Crear";
 }
 
-<h2>Crear Curso</h2>
+@if (!ViewBag.isExternal)
+{
+    <h2>Crear Curso Interno</h2>
+}
+else
+{
+    <h2>Crear Curso Externos</h2>
+}
+
 <p>Cree un curso agregando una Descripcion y un titulo, luego podra editarlo para agregar Lecciones</p>
+
 
 
 @using (Html.BeginForm()) 
@@ -15,63 +24,63 @@
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.organizationCourse.FirstOrDefault().creationDate, htmlAttributes: new { @class = "evaCreationDate" })
+        @Html.HiddenFor(model => model.course.organizationCourse.FirstOrDefault().creationDate, htmlAttributes: new { @class = "evaCreationDate" })
         @*@Html.Hidden("creationDate", DateTime.Now, new {@class = "evaCreationDate" })*@
         <div class="form-group">
-            @Html.LabelFor(model => model.title, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.title, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.title, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.title, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.description, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.description, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.description, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.commitmentDays, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.commitmentDays, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.commitmentDays, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.commitmentDays, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.commitmentDays, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.commitmentDays, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.commitmentHoursPerDay, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.course.commitmentHoursPerDay, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.commitmentHoursPerDay, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.commitmentHoursPerDay, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.course.commitmentHoursPerDay, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.course.commitmentHoursPerDay, "", new { @class = "text-danger" })
             </div>
         </div>
 
         @* organization course related information fields *@
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().originArea, "Area de Origen",htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.originArea, "Area de Origen",htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("originAreaID", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().originArea, "", new { @class = "text-danger" })
+                @Html.DropDownList("organizationInfo.originAreaID", (SelectList)ViewBag.originAreaID, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.organizationInfo.originArea, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().required, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.required, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().required, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().required, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.organizationInfo.required, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.organizationInfo.required, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.organizationCourse.FirstOrDefault().deadline, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.organizationInfo.deadline, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.organizationCourse.FirstOrDefault().deadline, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.organizationCourse.FirstOrDefault().deadline, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.organizationInfo.deadline, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.organizationInfo.deadline, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -108,7 +117,7 @@
         ss = ss < 10 ? '0' + ss : ss;
 
         var today = dd + '/' + MM + '/' + yyyy + ' '+ hh + ':' + mm + ':' + ss;
-        $('#creationDate').val(today);
+        $('.evaCreationDate').val(today);
     })
 </script>
 }

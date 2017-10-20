@@ -1,0 +1,66 @@
+﻿@model carEVA.Models.evaOrganizationArea
+
+@{
+    ViewBag.Title = "Area-detalles";
+}
+
+<h2>Detalles del area externa</h2>
+
+<div>
+    <h4>area Externa</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.organization.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.organization.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.areaCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.areaCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.nameAbreviation)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.nameAbreviation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isEnabled)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isEnabled)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isExternal)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isExternal)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.evaOrganizationAreaID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

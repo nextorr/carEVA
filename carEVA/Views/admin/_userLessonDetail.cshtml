@@ -1,0 +1,66 @@
+﻿@model IEnumerable<carEVA.Models.evaLessonDetail>
+
+<h2>Lesson Detail</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.courseEnrollment.evaCourseEnrollmentID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.lessonID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.viewed)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.passed)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.currentTotalGrade)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.completionDate)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.courseEnrollment.evaCourseEnrollmentID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.lessonID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.viewed)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.passed)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.currentTotalGrade)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.completionDate)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.evaLessonDetailID }) |
+            @Ajax.ActionLink("Detalles", "getUserQuestionDetailInfo", new { id = item.evaLessonDetailID },
+               new AjaxOptions()
+               {
+                   HttpMethod = "get",
+                   InsertionMode = InsertionMode.Replace,
+                   UpdateTargetId = "questionDetail"
+               })
+        </td>
+    </tr>
+}
+
+</table>
+
+@* renders the detail of the selected detail info *@
+
+<div id="questionDetail">
+
+</div>

@@ -1,0 +1,93 @@
+﻿@model IEnumerable<carEVA.Models.evaCarDefensoresAgua>
+
+<h2>Usuarios Car niños defensores del Agua en el Area</h2>
+<p>@Html.DisplayFor(model => model.FirstOrDefault().organization.name)</p>
+
+<p>
+    @Html.ActionLink("Pre inscribir Usuario en grupo", "Create"
+    , new { externalAreaID = Request.QueryString["externalAreaID"] })
+</p>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.fullName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.userName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.tipoDocumento)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.numeroDocumento)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.gender)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.institucionEducativa)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.edad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.municipio)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.gradoEstudio)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isActive)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.fullName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.userName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.tipoDocumento)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.numeroDocumento)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.email)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.gender)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.institucionEducativa)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.edad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.municipio)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.gradoEstudio)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isActive)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ID })
+        </td>
+    </tr>
+}
+
+</table>

@@ -155,8 +155,17 @@ namespace carEVA.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "LessonID,title,description,videoURL,ChapterID")] Lesson lesson, int? chapterID)
         {
+            evaMediaServices mediaService = new evaMediaServices();
+            string fileLocation;
+
             if (ModelState.IsValid)
             {
+                //save the file location and give the user feedback that the video is uploading
+                //view the create post method for more info
+                fileLocation = lesson.videoURL;
+                lesson.videoURL = "Procesando y publicando video";
+                mediaService.uploadVideoToAzure(fileLocation, lesson.LessonID);
+
                 db.Entry(lesson).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index", new {chapterID = lesson.ChapterID });

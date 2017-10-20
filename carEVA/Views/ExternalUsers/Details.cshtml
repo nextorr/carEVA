@@ -1,0 +1,122 @@
+﻿@model carEVA.Models.evaUser
+
+@{
+    ViewBag.Title = "Detalles";
+}
+
+<h2>detalles</h2>
+
+<div>
+    <h4>informacion del usuario</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.organization.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.organization.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.organizationArea.areaCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.organizationArea.areaCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.userName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.userName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.fullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.fullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.aspnetUserID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.aspnetUserID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.areaCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.areaCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gender)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.publicKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.publicKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isActive)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.totalEnrollments)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.totalEnrollments)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completedCatalogCourses)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completedCatalogCourses)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completedRequiredCourses)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completedRequiredCourses)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("volver a la lista", "Index", new {externalAreaID = Model.evaOrganizationAreaID })
+</p>

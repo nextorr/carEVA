@@ -1,0 +1,128 @@
+﻿@model carEVA.Models.evaUser
+
+@{
+    ViewBag.Title = "deleteEvaUser";
+}
+
+<h2>deleteEvaUser</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>evaUser</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.organization.name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.organization.name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.organizationArea.areaCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.organizationArea.areaCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.userName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.userName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.email)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.fullName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.fullName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.aspnetUserID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.aspnetUserID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.areaCode)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.areaCode)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.gender)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.gender)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.publicKey)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.publicKey)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.isActive)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.isActive)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.totalEnrollments)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.totalEnrollments)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completedCatalogCourses)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completedCatalogCourses)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.completedRequiredCourses)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.completedRequiredCourses)
+        </dd>
+
+    </dl>
+
+    @using (Html.BeginForm()) {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default" /> |
+            @Html.ActionLink("Back to List", "userAdmin")
+        </div>
+    }
+</div>

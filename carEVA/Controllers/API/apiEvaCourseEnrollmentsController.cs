@@ -45,7 +45,7 @@ namespace carEVA.Controllers
                 return BadRequest("ERROR : 100, the public key is invalid");
             }
 
-            var enrollments = db.evaCourseEnrollments.Where(m => m.evaUserID == userId).Include(c => c.Course).ToList();
+            var enrollments = db.evaCourseEnrollments.Where(m => m.evaBaseUserID == userId).Include(c => c.Course).ToList();
             var companyParameters = db.evaOrganizationCourses.Where(m => m.evaOrganizationID == userCompany).ToList();
 
             foreach(evaCourseEnrollment enrollmentItem in enrollments)
@@ -146,7 +146,7 @@ namespace carEVA.Controllers
 
             evaCourseEnrollment newEnrollment = new evaCourseEnrollment
             {
-                evaUserID = userID,
+                evaBaseUserID = userID,
                 CourseID = enrollment.courseID,
                 completedLessons = 0,
                 EnrollmentDate = DateTime.Now

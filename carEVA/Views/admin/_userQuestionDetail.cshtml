@@ -1,0 +1,70 @@
+﻿@model IEnumerable<carEVA.Models.evaQuestionDetail>
+
+<h2>Question Details</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.evaLessonDetailID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.questionID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.lastGradedAnswerID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.isCorrect)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.totalGrongAttempts)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.finalScore)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.currentMaxScore)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.evaLessonDetailID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.questionID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.lastGradedAnswerID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.isCorrect)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalGrongAttempts)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.finalScore)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.currentMaxScore)
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id=item.evaQuestionDetailID }) |
+            @Ajax.ActionLink("Detalles", "getUserAnswerHistoryInfo", new { id = item.evaQuestionDetailID },
+               new AjaxOptions()
+               {
+                   HttpMethod = "get",
+                   InsertionMode = InsertionMode.Replace,
+                   UpdateTargetId = "answerHistory"
+               })
+        </td>
+    </tr>
+}
+
+</table>
+
+<div id="answerHistory">
+
+</div>

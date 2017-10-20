@@ -37,10 +37,19 @@ namespace carEVA.Utils
         {
             if (mMediaCredentials == null || mMediaContext == null)
             {
-                //create and cache the media service credentials
-                mMediaCredentials = new MediaServicesCredentials(mMediaServicesAccountName, mMediaServicesAccountKey);
-                //then create the media context
-                mMediaContext = new CloudMediaContext(mMediaCredentials);
+                try
+                {
+                    //create and cache the media service credentials
+                    mMediaCredentials = new MediaServicesCredentials(mMediaServicesAccountName, mMediaServicesAccountKey);
+                    //then create the media context
+                    mMediaContext = new CloudMediaContext(mMediaCredentials);
+                }
+                catch (Exception e)
+                {
+                    e = MediaServicesExceptionParser.Parse(e);
+                    evaLogUtils.logErrorMessage("Media services, error creating service credentials ",
+                        mMediaCredentials, e, this.ToString(), "constructor");
+                }
             }
         }
 
@@ -69,6 +78,7 @@ namespace carEVA.Utils
         private void uploadAndSaveToDbThread(Object _params)
         {
             mediaThreadParams inputParams;
+            
             carEVAContext context = new carEVAContext();
             try
             {
@@ -77,14 +87,8 @@ namespace carEVA.Utils
             catch (InvalidCastException)
             {
                 //the parameters are invalid, log this information
-                context.evaLogs.Add(new evaLog()
-                {
-                    level = "ERROR",
-                    message = "Exception while casting the response: " + _params.ToString(),
-                    caller = "Thread Error",
-                    date = DateTime.Now
-                });
-                context.SaveChanges();
+                evaLogUtils.logErrorMessage("Upload Media Thread Exception while casting the response: " + _params.ToString(), 
+                    this.ToString(), nameof(this.uploadAndSaveToDbThread));
                 return;
             }
             //read the entry tp update
@@ -92,24 +96,18 @@ namespace carEVA.Utils
             if (lesson == null)
             {
                 //the lesson ID is invalid, log this information
-                context.evaLogs.Add(new evaLog()
-                {
-                    level = "ERROR",
-                    message = "the lesson ID does not exists" + inputParams.ToString(),
-                    caller = "Thread Error",
-                    date = DateTime.Now
-                });
-                context.SaveChanges();
+                evaLogUtils.logErrorMessage("Upload Media Thread the lesson ID does not exists " + _params.ToString(),
+                    this.ToString(), nameof(this.uploadAndSaveToDbThread));
                 return;
             }
 
             //try to upload the video to azure
             Uri publishLocation;
-            string videoName;
+            string videoName = "unassigned";
             string videoStorage;
             try
             {
-                IAsset fileAsset = UploadFile(inputParams.fileLocation, AssetCreationOptions.None);
+                IAsset fileAsset = UploadFile(inputParams.fileLocation, AssetCreationOptions.None, lesson.videoURL);
                 //and then publish the file so it can be viewed on android
                 videoName = fileAsset.Name;
                 videoStorage = fileAsset.StorageAccountName;
@@ -117,21 +115,9 @@ namespace carEVA.Utils
             }
             catch (Exception e)
             {
-                string exceptionMessage = "Exception: ";
-                while (e != null)
-                {
-                    exceptionMessage += e.Message + " -- ";
-                    e = e.InnerException;
-                }
-                //an error ocurred while trying to save to azure
-                context.evaLogs.Add(new evaLog()
-                {
-                    level = "ERROR",
-                    message = "Could not upload or publish the video on azure" + exceptionMessage,
-                    caller = "Thread Error",
-                    date = DateTime.Now
-                });
-                context.SaveChanges();
+                e = MediaServicesExceptionParser.Parse(e);
+                evaLogUtils.logErrorMessage("Upload Media Thread Could not upload or publish the video on azure ", 
+                    videoName, e, this.ToString(), nameof(this.uploadAndSaveToDbThread));
                 return;
             }
 
@@ -145,12 +131,20 @@ namespace carEVA.Utils
             File.Delete(inputParams.fileLocation);
         }
 
+        //we are using this method to check the locator structure 
+        public void locatorStructure()
+        {
+            var locator = mMediaContext.Locators;
+            
+        }
+
         //helper method to control the uploading of the file and eventually its progress
         //see https://azure.microsoft.com/en-us/documentation/articles/media-services-dotnet-get-started/
-        public IAsset UploadFile(string fileName, AssetCreationOptions options)
+        private IAsset UploadFile(string videoLocalPath, AssetCreationOptions options, string currentURL)
         {
+            
             IAsset asset = mMediaContext.Assets.CreateFromFile(
-                fileName,
+                videoLocalPath,
                 options,
                 (af, p) =>
                 {
@@ -160,7 +154,7 @@ namespace carEVA.Utils
         }
 
         //helper method to publish the asset and get the URL and save it to the database.
-        public Uri publishAndGetUrl(IAsset asset)
+        private Uri publishAndGetUrl(IAsset asset)
         {
             Uri filePublishLocations;
             // Publish the output asset by creating an Origin locator for adaptive streaming

@@ -40,7 +40,7 @@ namespace carEVA.Controllers.API
                 currentLessonDetail = db.evaLessonDetails.Where(p => p.evaLessonDetailID == lessonDetailID)
                     .Include(m => m.questionDetail).Include(m => m.courseEnrollment).Single();
                 currentUser = userUtils.userIdFromKey(db, publicKey);
-                if (currentLessonDetail.courseEnrollment.evaUserID != currentUser)
+                if (currentLessonDetail.courseEnrollment.evaBaseUserID != currentUser)
                 {
                     evaLogUtils.logWarningMessage("invalid publick key for the evaluation",
                         this.ToString(), nameof(this.GetevaQuestionDetails));
@@ -85,6 +85,8 @@ namespace carEVA.Controllers.API
                     }
                     //return BadRequest("ERROR : inconsistencia en el modelo, no hay detalle para la pregunta");
                 }
+                //erase the values for the responses on the answer so its not possible to view the responses
+                questionItem.answerOptions.Select(c => { c.isCorrect = false; return c; }).ToList();
                 //when the user first opens the quiz, we expect the detail to be empty, since single() fails, null is sent
                 quizDetailList.Add(new userQuiz()
                 {

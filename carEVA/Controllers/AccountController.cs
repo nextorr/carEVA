@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using carEVA.Models;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace carEVA.Controllers
 {

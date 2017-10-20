@@ -30,7 +30,6 @@ namespace carEVA.Models
         public System.Data.Entity.DbSet<carEVA.Models.Answer> Answers { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaType> evaTypes { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaFile> Files { get; set; }
-        public System.Data.Entity.DbSet<carEVA.Models.evaLogIn> evaLogIns { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaUser> evaUsers { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaCourseEnrollment> evaCourseEnrollments { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaLessonDetail> evaLessonDetails { get; set; }
@@ -41,6 +40,9 @@ namespace carEVA.Models
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationArea> evaOrganizationAreas { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaOrganizationCourse> evaOrganizationCourses { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaLog> evaLogs { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.evaInstructor> evaInstructor { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.evaBaseUser> evaBaseUser { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.evaCarDefensoresAgua> evaCarDefensoresAgua { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
