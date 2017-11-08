@@ -23,7 +23,7 @@ namespace carEVA.Models
                 return "_userInstructorList";
             }
         }
-        public override string getCreateViewName
+        public override string getCreateActionName
         {
             get
             {

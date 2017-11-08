@@ -24,7 +24,7 @@ namespace carEVA.Controllers.API
         [ResponseType(typeof(userOverviewScore))]
         public async Task<IHttpActionResult> Getscore(string publicKey)
         {
-            evaUser currentUser=null;
+            evaBaseUser currentUser=null;
             evaOrganization currentOrganization;
             userOverviewScore response;
 
@@ -35,8 +35,9 @@ namespace carEVA.Controllers.API
                 //currentUser = db.evaUsers.Where(p => p.publicKey == publicKey).Include(p => p.CourseEnrollments).Single();
                 //currentOrganization = db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).
                 //    Include(p => p.organizationCourses).Single();
-                currentUser = await db.evaUsers.Where(p => p.publicKey == publicKey).SingleAsync();
-                currentOrganization = await db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).SingleAsync();
+                currentUser = await db.evaBaseUser.Where(p => p.publicKey == publicKey).SingleAsync();
+                //currentOrganization = await db.evaOrganizations.Where(p => p.evaOrganizationID == currentUser.evaOrganizationID).SingleAsync();
+                currentOrganization = currentUser.organization;
             }
             catch (InvalidOperationException e)
             {

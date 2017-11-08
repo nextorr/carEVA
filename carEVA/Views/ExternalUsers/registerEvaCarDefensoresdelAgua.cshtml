@@ -4,14 +4,26 @@
     ViewBag.Title = "registerEvaCarDefensoresdelAgua";
 }
 
-<h2>registerEvaCarDefensoresdelAgua</h2>
+@section styles {
+    @Styles.Render("~/Content/jqueryUI")
+    @* use this style to render the loading animation when jquery UI autocomplete is fetching data *@
+    <style>
+        .ui-autocomplete-loading {
+            background: white url("../../Content/images/ui-anim_basic_16x16.gif") right center no-repeat;
+        }
+    </style>
+}
+
+<h2>Registro de Usuario</h2>
+
+<p>@Model.organizationArea.name - @Model.organization.name</p>
+<p>Completa la siguiete información para completar el registro</p>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Registrar Usuario</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.ID)
@@ -26,27 +38,19 @@
         @Html.HiddenFor(model => model.evaOrganizationID)
         @Html.HiddenFor(model => model.evaOrganizationAreaID)
 
-        @* ALSO: show this info to the user *@
+        @* this is used to post the info to the user, we need also to show it *@
         @Html.HiddenFor(model => model.fullName)
         @Html.HiddenFor(model => model.numeroDocumento)
 
 
-        <p>@Model.fullName</p>
-        <p>@Model.numeroDocumento</p>
+        <p>@Model.fullName - @Model.numeroDocumento</p>
         
-        @*TODO: this depends on the age of the users *@
-        <div class="form-group">
-            @Html.LabelFor(model => model.email, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.email, "", new { @class = "text-danger" })
-            </div>
-        </div>
+        
  
         <div class="form-group">
             @Html.LabelFor(model => model.gender, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.gender, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.DropDownList("gender", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.gender, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -62,15 +66,24 @@
         <div class="form-group">
             @Html.LabelFor(model => model.edad, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.edad, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.edad, new { htmlAttributes = new { @class = "form-control", data_eva_optional = "mail" } })
                 @Html.ValidationMessageFor(model => model.edad, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @*TODO: this depends on the age of the users *@
+        <div class="form-group evaOptionalEmail">
+            @Html.LabelFor(model => model.email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.email, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.municipio, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.municipio, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.TextBoxFor(model => model.municipio, new { data_autocomplete_url = Url.Action("AutocompleteMun"), @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.municipio, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -85,12 +98,52 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Siguiente" class="btn btn-default" />
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Regresar", "userRegistration")
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval");
+    @Scripts.Render("~/bundles/jqueryUI");
+
+    <script type="text/javascript" language="javascript">
+        $('*[data-autocomplete-url]').each(function () {
+            var inputReference = $(this);
+            $(this).autocomplete({
+                source: function (request, response) {
+                    var tempUrl = inputReference.data("autocomplete-url");
+                    $.ajax({
+                        url: tempUrl,
+                        dataType: "json",
+                        data: {
+                            term: request.term,
+                            org: 1 //this is CAR, harcoded since this view is specific to CAR
+                        },
+                        success: function (data) {
+                            response($.map(data, function (v, i) {
+                                return { value: v, ID: v };
+                            })
+                            );
+                        }
+                    });
+                },
+            });
+        });
+        $('*[data-eva-optional]').each(function () {
+            $(this).change(function () {
+                if ($(this).val() > 13) {
+                    $('.evaOptionalEmail').show();
+                }
+                else {
+                    $('.evaOptionalEmail').hide();
+                }
+            });
+        });
+    </script>
+}

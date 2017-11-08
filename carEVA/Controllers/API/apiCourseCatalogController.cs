@@ -12,6 +12,7 @@ using carEVA.Models;
 
 using carEVA.ViewModels;
 using carEVA.Utils;
+using System.Threading.Tasks;
 
 namespace carEVA.Controllers.API
 {
@@ -31,14 +32,13 @@ namespace carEVA.Controllers.API
         [ResponseType(typeof(evaOrganizationCourse))]
         public IHttpActionResult GetCourses(string publicKey)
         {
-            int orgID;
             int userId;
 
-            //use this parameter if you dont want all the children to be populated
+            //use this parameter so the JSON serializer dont load all the model
             db.Configuration.ProxyCreationEnabled = false;
+
             try
             {
-                orgID = userUtils.organizationIdFromKey(db, publicKey);
                 userId = userUtils.userIdFromKey(db, publicKey);
             }
             catch (InvalidOperationException e)
@@ -49,25 +49,43 @@ namespace carEVA.Controllers.API
                 return BadRequest("ERROR : 100, the public key is invalid");
             }
 
-            //force the execution of the query here so the loops dont fail (deffered execution)
-            var userEnrollments = db.evaCourseEnrollments.Where(p => p.evaBaseUserID == userId).ToList();
-            var orgCourses = db.evaOrganizationCourses.Where(p => p.evaOrganizationID == orgID).Include(m => m.course).ToList();
+            //get the user Area
+            //get all the courses the user has access to, given the area he belongs to
+            //IMPORTANT: since we are disabling lazy loading at the start, we need to include all the 
+            //children in this query
+            List<evaOrganizationCourse> orgCourses = db.evaBaseUser//.Include(m=>m.organization)
+                .Include(m=>m.organizationArea.audiencePerCourseAreas
+                .Select(mx=>mx.evaOrganizationCourse)
+                .Select(c=>c.course))
+                .Where(o => o.ID == userId).Single()
+                .organizationArea
+                .audiencePerCourseAreas
+                .Where(p => p.permissionLevel == areaPermission.canEnrol)
+                .Select(o => o.evaOrganizationCourse).ToList();
 
-            foreach (evaOrganizationCourse item in orgCourses)
+            List<evaCourseEnrollment> userEnrollments = db.evaCourseEnrollments
+                .Where(p => p.evaBaseUserID == userId).ToList();
+
+            foreach (evaOrganizationCourse courseItem in orgCourses)
             {
-                foreach(evaCourseEnrollment enrol in userEnrollments)
+                foreach (evaCourseEnrollment enrol in userEnrollments)
                 {
-                    if(enrol.CourseID == item.courseID)
+                    //the following fields are not needed to be sent on the JSON response
+                    enrol.evaUser = null;
+                    if (enrol.CourseID == courseItem.courseID)
                     {
-                        //this clears the user field so it is not sent on the response
-                        enrol.evaUser = null;
                         //the user is enrolled in this course
                         //this writes the enrollment infor to be sent in the service
-                        item.course.enrollments.Add(enrol);
+                        courseItem.course.enrollments.Add(enrol);
                     }
                 }
+                //the following fields are not needed to be sent on the JSON response
+                courseItem.audienceAreas = null;
+                courseItem.originArea = null;
+                courseItem.organization = null;
             }
 
+            
             return Ok(orgCourses);
         }
 

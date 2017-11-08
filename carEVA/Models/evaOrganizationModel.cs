@@ -65,18 +65,27 @@ namespace carEVA.Models
         public virtual evaOrganization organization { get; set; }
         //read this as: courses that has this Origin area. 1course -> 1 areas; 1area -> many courses
         public virtual ICollection<evaOrganizationCourse> organizationCourses { get; set; }
-        public virtual ICollection<audiencePerCourse> audiencePerCourseAreas { get; set; }
+        public virtual ICollection<evaOrgCourseAreaPermissions> audiencePerCourseAreas { get; set; }
         public virtual ICollection<evaBaseUser> usersInGroup { get; set; }
 
     }
-    //like the course enrollment, this is used to autorize Areas to view certain courses
-    public class audiencePerCourse
+    //this enumeration defines the standarized access levels
+    public enum areaPermission
     {
-        public int audiencePerCourseID { get; set; }
+        deny, //all the users in the area cant access the course.
+        read, //can only view the information, but cannot enroll.
+        canEnrol, //all the users in the area can enrol in the course.
+    }
+    //like the course enrollment, this is used to autorize Areas to view certain courses
+    public class evaOrgCourseAreaPermissions
+    {
+        public int evaOrgCourseAreaPermissionsID { get; set; }
         public int evaOrganizationCourseID { get; set; }
         public int evaOrganizationAreaID { get; set; }
-        public evaOrganizationCourse evaOrganizationCourse { get; set; }
-        public evaOrganizationArea evaOrganizationArea { get; set; }
+        public virtual evaOrganizationCourse evaOrganizationCourse { get; set; }
+        public virtual evaOrganizationArea evaOrganizationArea { get; set; }
+        //--------------Join table payload-----------------------------
+        public areaPermission permissionLevel { get; set; }
     }
     //relates many organizations to many courses with payload
     public class evaOrganizationCourse
@@ -103,6 +112,6 @@ namespace carEVA.Models
         public int originAreaID { get; set; }
         [ForeignKey("originAreaID")]
         public virtual evaOrganizationArea originArea { get; set; }
-        public virtual ICollection<audiencePerCourse> audienceAreas { get; set; }
+        public virtual ICollection<evaOrgCourseAreaPermissions> audienceAreas { get; set; }
     }
 }

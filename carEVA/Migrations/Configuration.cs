@@ -29,6 +29,52 @@ namespace carEVA.Migrations
             //    );
             //
 
+            //seed the permission table with default values for initialization.
+            //WARNIGN: delete this after the initial seed, to prevent overwriting permissions changes
+            //List<evaOrgCourseAreaPermissions> permissions = new List<evaOrgCourseAreaPermissions>();
+            ////get all the internal organization courses and add access to all the internal areas 
+            ////unrestricted access to all the courses!
+            //List<evaOrganizationCourse> orgCourses = context.evaOrganizationAreas
+            //    .Include(o=>o.organizationCourses)
+            //    .Where(o => o.isExternal == false)
+            //    .SelectMany(o=>o.organizationCourses).ToList();
+            //List<evaOrganizationCourse> ExternalCourses = context.evaOrganizationAreas
+            //    .Include(o => o.organizationCourses)
+            //    .Where(o => o.isExternal)
+            //    .SelectMany(o => o.organizationCourses).ToList();
+            //List<evaOrganizationArea> orgAreas = context.evaOrganizationAreas
+            //    .Where(o => o.isExternal == false).ToList();
+            //List<evaOrganizationArea> externalAreas = context.evaOrganizationAreas
+            //    .Where(o => o.isExternal).ToList();
+            //foreach (evaOrganizationCourse orgCourse in orgCourses)
+            //{
+            //    foreach (evaOrganizationArea orgArea in orgAreas)
+            //    {
+            //        //internal areas has access to the internal courses
+            //        permissions.Add(new evaOrgCourseAreaPermissions {
+            //            evaOrganizationCourseID=orgCourse.evaOrganizationCourseID,
+            //            evaOrganizationAreaID=orgArea.evaOrganizationAreaID,
+            //            permissionLevel= areaPermission.canEnrol
+            //        });
+            //    }
+            //}
+            //foreach (evaOrganizationCourse orgCourse in ExternalCourses)
+            //{
+            //    foreach (evaOrganizationArea orgArea in externalAreas)
+            //    {
+            //        //external areas has permission to the external courses
+            //        permissions.Add(new evaOrgCourseAreaPermissions
+            //        {
+            //            evaOrganizationCourseID = orgCourse.evaOrganizationCourseID,
+            //            evaOrganizationAreaID = orgArea.evaOrganizationAreaID,
+            //            permissionLevel = areaPermission.canEnrol
+            //        });
+            //    }
+            //}
+            //context.evaOrgCourseAreaPermissions.AddRange(permissions);
+            //context.SaveChanges();
+
+
             //we no longer need this initialization method. 
             //so it does not interfere with existing data.
             //var evaOrganizations = new List<evaOrganization>

@@ -5,14 +5,11 @@
 }
 
 <h2>Inscripcion Exitosa!!</h2>
-<h2>Sea completado tu registro @Model.fullName</h2>
-<h2>Te encuentras inscrito en @Model.organizationArea.name</h2>
-<p>Ya puedes hacer uso de EVA con el usuario y la contraseña que registraste</p>
 
 <div>
     <h4>Sea completado tu registro en:</h4>
-    <h4>@Model.organizationArea.name</h4>
-    <h4>@Model.organization.name</h4>
+    <h4>@Model.organizationArea.name - @Model.organization.name</h4>
+    <p>@Model.fullName ya puedes hacer uso de EVA con el usuario y la contraseña que registraste</p>
     <hr />
     <dl class="dl-horizontal">
 
@@ -39,7 +36,9 @@
         <dd>
             @Html.DisplayFor(model => model.email)
         </dd>
-
+        <dt>
+            @Html.DisplayNameFor(model => model.gender)
+        </dt>
         <dd>
             @Html.DisplayFor(model => model.gender)
         </dd>
@@ -102,7 +101,3 @@
 
     </dl>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>

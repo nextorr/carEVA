@@ -384,6 +384,14 @@
     <Compile Include="Migrations\201710121955384_defensoresTypeAdjustement.Designer.cs">
       <DependentUpon>201710121955384_defensoresTypeAdjustement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710231640554_municipios.cs" />
+    <Compile Include="Migrations\201710231640554_municipios.Designer.cs">
+      <DependentUpon>201710231640554_municipios.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711021653155_coursePermissions.cs" />
+    <Compile Include="Migrations\201711021653155_coursePermissions.Designer.cs">
+      <DependentUpon>201711021653155_coursePermissions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
@@ -395,6 +403,7 @@
     <Compile Include="Models\evaModels.cs" />
     <Compile Include="Models\evaOrganizationModel.cs" />
     <Compile Include="Models\evaUserModel.cs" />
+    <Compile Include="Models\geoModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -659,12 +668,12 @@
     <Content Include="Views\ExternalUsers\Index.cshtml" />
     <Content Include="Views\ExternalUsers\_userList.cshtml" />
     <Content Include="Views\ExternalUsers\_carDefensoresAguaUserList.cshtml" />
-    <Content Include="Views\ExternalUsers\evaCarDefensoresAguaCreate.cshtml" />
     <Content Include="Views\ExternalUsers\evaCarDefensoresAguaEdit.cshtml" />
     <Content Include="Views\ExternalUsers\userRegistration.cshtml" />
     <Content Include="Views\ExternalUsers\registerEvaCarDefensoresdelAgua.cshtml" />
     <Content Include="Views\ExternalUsers\passwordEvaCarDefensoresdelAgua.cshtml" />
     <Content Include="Views\ExternalUsers\successEvaCarDefensoresAgua.cshtml" />
+    <Content Include="Views\ExternalUsers\CreateEvaCarDefensoresAgua.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -770,6 +779,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710121955384_defensoresTypeAdjustement.resx">
       <DependentUpon>201710121955384_defensoresTypeAdjustement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710231640554_municipios.resx">
+      <DependentUpon>201710231640554_municipios.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711021653155_coursePermissions.resx">
+      <DependentUpon>201711021653155_coursePermissions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -19,32 +19,39 @@ namespace carEVA.Utils
         /// <returns></returns>
         public static int userIdFromKey(carEVAContext context, string publicKey)
         {
-            return context.evaUsers.Where(u => u.publicKey == publicKey).Single().ID;
+            //TODO: check base user change stability
+            //return context.evaUsers.Where(u => u.publicKey == publicKey).Single().ID;
+            return context.evaBaseUser.Where(u => u.publicKey == publicKey).Single().ID;
         }
 
         //---------------------------------------------------------------------------------------------
 
         public static int organizationIdFromKey(carEVAContext context, string publicKey)
         {
-            return context.evaUsers.Where(u => u.publicKey == publicKey).Single().evaOrganizationID; 
+            //TODO: check base user change stability
+            //return context.evaUsers.Where(u => u.publicKey == publicKey).Single().evaOrganizationID; 
+            return context.evaBaseUser.Where(u => u.publicKey == publicKey).Single().evaOrganizationID;
         }
 
         //---------------------------------------------------------------------------------------------
         public static async Task<int> organizationIdFromAspIdentity(carEVAContext context, string aspUserID)
         {
+            //TODO: check base user change stability
             evaUser currentUser = await context.evaUsers.Where(u => u.aspnetUserID == aspUserID).FirstOrDefaultAsync();
             return currentUser.evaOrganizationID;
         }
         //---------------------------------------------------------------------------------------------
         public static evaOrganizationArea areaFromAspIdentity(carEVAContext context, string aspUserID)
         {
+            //TODO: check base user change stability
             evaUser currentUser = context.evaUsers.Where(u => u.aspnetUserID == aspUserID).Single();
             return currentUser.organizationArea;
         }
         //---------------------------------------------------------------------------------------------
         public static int incrementEnrolledCourses(carEVAContext context, string publicKey)
         {
-            evaUser currentUser = context.evaUsers.Where(u => u.publicKey == publicKey).Single();
+            //TODO: check base user change stability
+            evaBaseUser currentUser = context.evaBaseUser.Where(u => u.publicKey == publicKey).Single();
             if(currentUser == null)
             {
                 return -1;
@@ -56,7 +63,7 @@ namespace carEVA.Utils
         //---------------------------------------------------------------------------------------------
         public static bool decrementEnrolledCourses(carEVAContext context, int evaUserID)
         {
-            evaUser currenUser = context.evaUsers.Where(u => u.ID == evaUserID).Single();
+            evaBaseUser currenUser = context.evaBaseUser.Where(u => u.ID == evaUserID).Single();
             if (currenUser == null)
             {
                 return false;
@@ -102,6 +109,7 @@ namespace carEVA.Utils
         //---------------------------------------------------------------------------------------------
         public static bool deleteUserAndAspnetIdentity(int evaUserID, carEVAContext context, UserManager<ApplicationUser> userManager)
         {
+            //TODO: check base user change stability
             evaUser currentUser = context.evaUsers.Find(evaUserID);
             if (currentUser == null)
             {

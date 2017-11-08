@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -13,6 +14,8 @@ namespace carEVA.Models
         //cedula de ciudadania
         CC
     }
+    
+    
     public class externalUserContainer
     {
         public string className { get; set; }
@@ -51,9 +54,11 @@ namespace carEVA.Models
         public documentTypes tipoDocumento { get; set; }
         [DisplayName("Numero de documento")]
         public long numeroDocumento { get; set; }
-        public int edad { get; set; }
+        [Range(13,18)]
+        public int? edad { get; set; }
         public string municipio { get; set; }
         [DisplayName("Grado de estudio")]
+        [Range(1, 11)]
         public string gradoEstudio { get; set; }
         public override string getIndexViewName
         {
@@ -62,11 +67,11 @@ namespace carEVA.Models
                 return "_carDefensoresAguaUserList";
             }
         }
-        public override string getCreateViewName
+        public override string getCreateActionName
         {
             get
             {
-                return "evaCarDefensoresAguaCreate";
+                return "CreateEvaCarDefensoresAgua";
             }
         }
         public override string getEditViewName

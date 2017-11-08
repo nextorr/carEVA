@@ -273,8 +273,10 @@ namespace carEVA.Utils
         private bool updateUserPublicKey(string userName, string domain, string publicKey)
         {
             //exclude instructors from this query as they cannot take courses
+            //exclude inactive users
             evaBaseUser originalUser = db.evaBaseUser.Where(l => l.userName == (userName+ "@" + domain)
-                        && !(l is evaInstructor)).SingleOrDefault();
+                        && !(l is evaInstructor))
+                        .Where(l => l.isActive).SingleOrDefault();
             if (originalUser != null)
             {
                 originalUser.publicKey = publicKey;
@@ -283,7 +285,7 @@ namespace carEVA.Utils
                 //the operation succeded
                 return true;
             }
-            //the operation failed, the user does not exist on the EVA model
+            //the operation failed, no valid user found on the eva model
             return false;
         }
         //---------------------------------------------------------------------------------------------

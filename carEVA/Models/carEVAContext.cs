@@ -43,12 +43,14 @@ namespace carEVA.Models
         public System.Data.Entity.DbSet<carEVA.Models.evaInstructor> evaInstructor { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaBaseUser> evaBaseUser { get; set; }
         public System.Data.Entity.DbSet<carEVA.Models.evaCarDefensoresAgua> evaCarDefensoresAgua { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.municipio> municipios { get; set; }
+        public System.Data.Entity.DbSet<carEVA.Models.evaOrgCourseAreaPermissions> evaOrgCourseAreaPermissions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             //base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<evaOrganizationCourse>().HasRequired(p => p.originArea).WithMany(m => m.organizationCourses).WillCascadeOnDelete(false);
-            modelBuilder.Entity<audiencePerCourse>().HasRequired(p => p.evaOrganizationCourse).WithMany(m => m.audienceAreas).WillCascadeOnDelete(false);
+            //modelBuilder.Entity<audiencePerCourse>().HasRequired(p => p.evaOrganizationCourse).WithMany(m => m.audienceAreas).WillCascadeOnDelete(false);
         }
 
     }

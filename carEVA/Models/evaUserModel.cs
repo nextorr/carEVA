@@ -10,7 +10,13 @@ using System.Web.Mvc;
 
 namespace carEVA.Models
 {
-    
+    //use this to define the genders. 
+    //Cant use a enum because integration with SIDCAR.
+    static public class genderType
+    {
+        static private readonly string[] genderDefinition = {"", "M", "F" };
+        static public List<string> genderList { get { return genderDefinition.ToList(); } }
+    }
     public class evaLogIn
     {
         public string user { get; set; }
@@ -42,11 +48,13 @@ namespace carEVA.Models
         public string userName { get; set; }
         //the username is in the email format,but we need an additional email field to 
         //allow for user alternate email address.
+        [DisplayName("Correo Electronico")]
         public string email { get; set; }
         [DisplayName("Nombre Completo")]
         public string fullName { get; set; }
         public string aspnetUserID { get; set; }
         public string areaCode { get; set; }
+        [DisplayName("Genero")]
         public string gender { get; set; }
         public string publicKey { get; set; }
         public bool isActive { get; set; }
@@ -68,7 +76,7 @@ namespace carEVA.Models
         [JsonIgnore]
         public abstract string getIndexViewName { get;}
         [JsonIgnore]
-        public abstract string getCreateViewName { get;}
+        public abstract string getCreateActionName { get;}
         [JsonIgnore]
         public abstract string getEditViewName { get; }
         public virtual string registerUserControllerName()
@@ -87,7 +95,7 @@ namespace carEVA.Models
                 return "_userList";
             }
         }
-        public override string getCreateViewName
+        public override string getCreateActionName
         {
             get
             {
@@ -119,7 +127,7 @@ namespace carEVA.Models
         //------------------------------
         public virtual Course Course { get; set; }
         [ForeignKey("evaBaseUserID")]
-        public virtual evaUser evaUser { get; set; }
+        public virtual evaBaseUser evaUser { get; set; }
         //this gives me the lesson detail per user
         public virtual ICollection<evaLessonDetail> lessonDetail { get; set; }
         

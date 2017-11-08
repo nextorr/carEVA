@@ -16,7 +16,6 @@ using Microsoft.AspNet.Identity.Owin;
 
 namespace carEVA.Controllers
 {
-    [Authorize]
     public class ExternalUsersController : Controller
     {
         private carEVAContext db = new carEVAContext();
@@ -76,26 +75,31 @@ namespace carEVA.Controllers
             return View(evaUser);
         }
 
+        //this only creates external users
         // GET: ExternalUsers/Create
         public async Task<ActionResult> Create(int externalAreaID, string message)
         {
-            evaOrganizationArea area = db.evaOrganizationAreas.Find(externalAreaID);
+            evaOrganizationArea area = await db.evaOrganizationAreas.FindAsync(externalAreaID);
             ViewBag.areaName = area.name;
             ViewBag.Message = message; //used to show a success message to the user
 
             //use a dummy user to send default data to the view
             evaBaseUser dummyUser = externalUsers.createInstance(area.externalType);
-            dummyUser.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
-            dummyUser.evaOrganizationAreaID = externalAreaID;
-            dummyUser.completedCatalogCourses = 0;
-            dummyUser.completedRequiredCourses = 0;
-            dummyUser.totalEnrollments = 0;
-            dummyUser.aspnetUserID = "";
-            dummyUser.publicKey = "";
-            dummyUser.areaCode = area.areaCode;
-            dummyUser.isActive = false;
+            return RedirectToAction(dummyUser.getCreateActionName, new { externalAreaID = externalAreaID,
+                message = message });
+            //dummyUser.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+            //dummyUser.evaOrganizationAreaID = externalAreaID;
+            //dummyUser.completedCatalogCourses = 0;
+            //dummyUser.completedRequiredCourses = 0;
+            //dummyUser.totalEnrollments = 0;
+            //dummyUser.aspnetUserID = "";
+            //dummyUser.publicKey = "";
+            //dummyUser.areaCode = area.areaCode;
+            //dummyUser.isActive = false;
             //the specific view for each especific external user is specified here
-            return View(dummyUser.getCreateViewName, dummyUser);
+            //TODO: instead of redirecting to the view redirect to the controller here, so we have more control
+            //return View(dummyUser.getCreateViewName, dummyUser);
+            
         }
 
         // POST: ExternalUsers/Create
@@ -117,6 +121,29 @@ namespace carEVA.Controllers
             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
+        // GET: ExternalUsers/CreateEvaCarDefensoresAgua
+        //especific implementation on the create evacardefensores
+        public async Task<ActionResult> CreateEvaCarDefensoresAgua(int externalAreaID, string message)
+        {
+            //TODO: put a correct view and organization area name.
+            evaOrganizationArea area = await db.evaOrganizationAreas.FindAsync(externalAreaID);
+            ViewBag.areaName = area.name;
+            ViewBag.Message = message; //used to show a success message to the user
+            //populate the gender list
+            ViewBag.gender = new SelectList(genderType.genderList);
+            //use a dummy user to send default data to the view
+            evaCarDefensoresAgua dummyUser = new evaCarDefensoresAgua();
+            dummyUser.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+            dummyUser.evaOrganizationAreaID = area.evaOrganizationAreaID;
+            dummyUser.completedCatalogCourses = 0;
+            dummyUser.completedRequiredCourses = 0;
+            dummyUser.totalEnrollments = 0;
+            dummyUser.aspnetUserID = "";
+            dummyUser.publicKey = "";
+            dummyUser.areaCode = area.areaCode;
+            dummyUser.isActive = false;
+            return View(dummyUser);
+        }
 
         //implementing the create specifics for creating car defensores del agua.
         [HttpPost]
@@ -125,19 +152,35 @@ namespace carEVA.Controllers
             +",gender,publicKey,isActive,totalEnrollments,completedCatalogCourses,completedRequiredCourses,evaOrganizationAreaID,evaOrganizationID" 
             + ", institucionEducativa, tipoDocumento, numeroDocumento, edad, municipio, gradoEstudio")] evaCarDefensoresAgua evaUser)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                evaUser.userName += "@defensores.car.gov.co";
-                db.evaCarDefensoresAgua.Add(evaUser);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Create", new
-                {
-                    externalAreaID = evaUser.evaOrganizationAreaID,
-                    message = "Usuario " + evaUser.fullName + " Pre- inscrito"
-                });
+                //return to the view with the error messages
+                //populate the view list and fields
+                ViewBag.areaName = db.evaOrganizationAreas.Find(evaUser.evaOrganizationAreaID).name;
+                ViewBag.gender = new SelectList(genderType.genderList);
+                return View(evaUser);
+            }
+            //we need to add this specific validation. its only aplicable here so we cant use DataAnnotations
+            if (evaUser.userName.Contains("@"))
+            {
+                ModelState.AddModelError("userName", "este campo no puede contener @. solo ingrese el nombre del usuario");
+                //return to the view with the error messages
+                //populate the view list and fields
+                ViewBag.gender = new SelectList(genderType.genderList);
+                return View(evaUser);
             }
 
-            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            //data is valid, proceed to create the user.
+            evaUser.userName += "@defensores.car.gov.co";
+            db.evaCarDefensoresAgua.Add(evaUser);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Create", new
+            {
+                externalAreaID = evaUser.evaOrganizationAreaID,
+                message = "Usuario " + evaUser.fullName + " Pre- inscrito"
+            });
+            
+            
         }
 
         // GET: ExternalUsers/Edit/5
@@ -188,7 +231,7 @@ namespace carEVA.Controllers
         }
 
         // GET: ExternalUsers/userRegistration
-        //this ask for name and ID to load the corresponding inscription form
+        //this ask the user for name and ID to load the corresponding inscription form
         public ActionResult userRegistration(bool? documentError)
         {
             if (documentError == true)
@@ -234,10 +277,14 @@ namespace carEVA.Controllers
             evaCarDefensoresAgua defensoresUser = db.evaCarDefensoresAgua.Find(userID);
             if (defensoresUser.numeroDocumento != idNumber)
             {
-                //TODO, inform the user the ID is invalid
+                //returnig to the root of the registration process
+                //informing the user there where a error
                 return RedirectToAction("userRegistration", new { documentError = true });
 
             }
+            //populate the dropdown lists
+            ViewBag.gender = new SelectList(genderType.genderList, "M");
+            ViewBag.municipio = new SelectList(db.municipios.Where(m => m.evaOrganizationID == 1), "nombre", "nombre");
             return View(defensoresUser);
         }
         //implementing the create specifics for creating car defensores del agua.
@@ -261,7 +308,7 @@ namespace carEVA.Controllers
             evaCarDefensoresAgua defensoresUser = db.evaCarDefensoresAgua.Find(userID);
             if (defensoresUser == null)
             {
-                //Here the user must exist, so if the fin fail is a bad request
+                //Here the user must exist, so if we cant find it is a bad request
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
 
             }
@@ -269,15 +316,20 @@ namespace carEVA.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> passwordEvaCarDefensoresdelAgua([Bind(Include = "password")]string pw
-            , [Bind(Include = "ID", Prefix ="userInfo")]int userID)
+        public async Task<ActionResult> passwordEvaCarDefensoresdelAgua(
+            [Bind(Include = "password, confirmPassword")]carDefensoresPasswordViewModel pw
+            , [Bind(Include = "ID, edad", Prefix ="userInfo")]evaCarDefensoresAgua userID)
         {
-            evaCarDefensoresAgua defensoresUser = db.evaCarDefensoresAgua.Find(userID);
+            evaCarDefensoresAgua defensoresUser = db.evaCarDefensoresAgua.Find(userID.ID);
+            if (!ModelState.IsValid)
+            {
+                return View(new carDefensoresPasswordViewModel { password = "", userInfo = defensoresUser });
+            }
             //and create it on aspnetUsers
             evaSignInManager evaManager = new evaSignInManager(db
                 , HttpContext.GetOwinContext().Get<ApplicationSignInManager>());
             string aspnetGUID = await evaManager.createExternalLogin(defensoresUser.userName
-                , defensoresUser.email, pw);
+                , defensoresUser.email, pw.password);
             if (aspnetGUID == null)
             {
                 //the creation failed, 
@@ -290,6 +342,9 @@ namespace carEVA.Controllers
             //activate the user, 
             defensoresUser.aspnetUserID = aspnetGUID;
             defensoresUser.publicKey = new Guid().ToString();
+            //persist the changes on the database
+            db.Entry(defensoresUser).State = EntityState.Modified;
+            await db.SaveChangesAsync();
             //TODO: send to the success confirmation window
             return View("successEvaCarDefensoresAgua", defensoresUser);
         }
@@ -302,6 +357,16 @@ namespace carEVA.Controllers
                 .Where(x => (!(x is evaUser) && !(x is evaInstructor)))
                 .Where(x => !x.isActive)
                 .Select(x => new userFullName { evaUserID = x.ID, fullName = x.fullName }).ToList();
+            return Json(filteredItems, JsonRequestBehavior.AllowGet);
+        }
+
+        //TODO migrate this to an API service
+        public ActionResult AutocompleteMun(string term, int org)
+        {
+            List<string> filteredItems = db.municipios
+                .Where(x => x.evaOrganizationID == 1)
+                .Where(x => x.nombre.Contains(term))
+                .Select(x => x.nombre).ToList();
             return Json(filteredItems, JsonRequestBehavior.AllowGet);
         }
 
