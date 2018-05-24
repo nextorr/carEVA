@@ -67,7 +67,20 @@ namespace carEVA.Controllers
         {
             userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(new ApplicationDbContext()));
             evaUser user = db.evaUsers.Find(int.Parse(evaUserID));
-            //just copy the user information profile
+            //check if the instructor already exists
+            if (db.evaInstructor.Where(i => i.userName == user.userName).Count() >= 1)
+            {
+                //check if it has the ASPNET instructor role, add it if is not and the return
+                var aspnetUser = userManager.FindByName(user.userName);
+                if (!userManager.IsInRole(aspnetUser.Id, evaRoles.instructor))
+                {
+                    userManager.AddToRole(aspnetUser.Id, evaRoles.instructor);
+                    return RedirectToAction("Index");
+                }
+                ModelState.AddModelError("alternativeMail", "el usuario ya es un instructor");
+                return View();
+            }
+            //if the instructor does not exist create it and add it to the database
             evaInstructor instructor = new evaInstructor()
             {
                 userName = user.userName,
@@ -80,11 +93,7 @@ namespace carEVA.Controllers
                 isActive = true,
                 evaOrganizationID = user.evaOrganizationID
             };
-            //save the instructor if it does not exists
-            if (db.evaInstructor.Where(i => i.userName == instructor.userName).Count() >= 1)
-            {
-                return RedirectToAction("Index");
-            }
+           
             db.evaInstructor.Add(instructor);
             db.SaveChanges();
             //add this user to the instructor role.

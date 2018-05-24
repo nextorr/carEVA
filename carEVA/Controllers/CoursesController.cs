@@ -36,39 +36,60 @@ namespace carEVA.Controllers
         [Authorize(Roles = evaRoles.Instructor)]
         public async Task<ActionResult> Index(int? organizationAreaID)
         {
-            //use this to set up the view
-            ViewBag.isExternal = false;
+            //NEW MODEL INCLUDING COLABORATORS
+            List<CourseProfileViewModel> courseProfiles = new List<CourseProfileViewModel>();
             int instructorID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
-            //USAGE: the course query depends on the parameters that are sent to the controller.
-            //at the end we need to filter the courses to show only those of the logged in instructor
-            List<Course> courses;
-            IEnumerable<Course> courseQuery;
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+
             if (organizationAreaID != null)
             {
-                courseQuery = db.evaOrganizationAreas.Find(organizationAreaID).organizationCourses.Select(x => x.course);
-                ViewBag.isExternal = db.evaOrganizationAreas.Find(organizationAreaID).isExternal;
-                ViewBag.organizationAreaID = organizationAreaID;
+                courseProfiles.Add(new CourseProfileViewModel
+                {
+                    myCourse = db.evaOrganizationAreas.Where(o => o.isExternal == true && o.evaOrganizationID == orgID)
+                    .SelectMany(m => m.organizationCourses).Where(m => m.evaInstructorID == instructorID)
+                    .Select(c => c.course),
+                    organizationAreaID = organizationAreaID,
+                    profileType = courseProfileTypes.externalCourse
+                });
+                return View(courseProfiles);
             }
             else
             {
-                //return only internal courses
-                courseQuery = db.evaOrganizationAreas.Where(o => o.isExternal == false)
-                    .SelectMany(m => m.organizationCourses).Select(c =>c.course);
-            }
-            courses = courseQuery.Where(c => c.evaInstructorID == instructorID).ToList();
-            //construct the view model to see all the relevant data
-            List<CoursesViewModels> courseVmList = new List<CoursesViewModels>();
-            foreach (Course item in courses)
-            {
-                int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
-                CoursesViewModels model = new CoursesViewModels()
+                courseProfiles.Add(new CourseProfileViewModel
                 {
-                    course = item,
-                    organizationInfo = item.organizationCourse.Where(org => org.evaOrganizationID == orgID).FirstOrDefault()
-                };
-                courseVmList.Add(model);
+                    myCourse = db.evaOrganizationAreas.Where(o => o.isExternal == false && o.evaOrganizationID == orgID)
+                                    .SelectMany(m => m.organizationCourses).Where(m => m.evaInstructorID == instructorID)
+                                    .Select(c => c.course),
+                    profileType = courseProfileTypes.internalCourse
+                });
+                courseProfiles.Add(new CourseProfileViewModel
+                {
+                    myCourse = db.evaOrganizationAreas.Where(o => o.isExternal == true && o.evaOrganizationID == orgID)
+                    .SelectMany(m => m.organizationCourses).Where(m => m.evaInstructorID == instructorID)
+                    .Select(c => c.course),
+                    organizationAreaID = organizationAreaID,
+                    profileType = courseProfileTypes.externalCourse
+                });
+                //get the courses the colaborator has access to.
+                List<evaOrganizationCourse> colaboratorOf = db.evaInstructor
+                    .Where(m => m.ID == instructorID)
+                    .SelectMany(m => m.colaboratorOf).ToList();
+                List<evaOrganizationCourse> externalCourse = db.evaOrganizationAreas
+                    .Where(o => o.isExternal == false)
+                    .SelectMany(m => m.organizationCourses).ToList();
+                courseProfiles.Add(new CourseProfileViewModel
+                {
+                    //myCourse = db.evaOrganizationAreas.Where(o => o.isExternal == false)
+                    //.SelectMany(m => m.organizationCourses).Where(m => m.evaColaboratorID == instructorID)
+                    //.Select(c => c.course),
+                    myCourse = colaboratorOf
+                        .Intersect(externalCourse, new evaOrganizationCourseComparer())
+                        .Select(m => m.course).ToList(),
+                    profileType = courseProfileTypes.sharedCourse
+                });
             }
-            return View(courseVmList);
+
+            return View(courseProfiles);
         }
 
         // GET: Courses/Details/5
@@ -85,12 +106,88 @@ namespace carEVA.Controllers
             }
             return View(course);
         }
+        public async Task<ActionResult> viewColaborators(int? courseID, int? organizationAreaID)
+        {
+            if (courseID == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+            //Get the list of colaborators from the courseID to prevent addin a new viewmodel
+            //plus by definition, a course can only be associated to an organization only ONE TIME.
+            //TODO: as now there is no way to associate a course to multiple organizations.
+            Course currentCourse = db.Courses.Find(courseID);
+            ViewBag.currentCourse = currentCourse;
+            evaOrganizationCourse orgCourse = currentCourse.organizationCourse
+                .Where(m => m.evaOrganizationID == orgID).Single();
+            ViewBag.organizationCourse = orgCourse;
+            List<evaInstructor> colaborators = orgCourse.colaborators.ToList();
 
+            return View(colaborators);
+        }
+        //add a colaborator to an organization course.
+        public async Task<ActionResult> addColaborator(int? orgCourseID)
+        {
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+            int currentInstructor = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
+            if (orgCourseID == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            //get the organization course from the course ID
+            //By definition, a course can only be associated to an organization only ONE TIME.
+            //evaOrganizationCourse orgCourse = db.evaOrganizationCourses
+            //    .Include(m => m.colaborators)
+            //    .SingleOrDefault(o => o.evaOrganizationCourseID == orgCourseID);
+            evaOrganizationCourse orgCourse = db.evaOrganizationCourses.Find(orgCourseID);
+            ViewBag.courseTitle = orgCourse.course.title;
+            List<evaInstructor> instructores = db.evaInstructor
+                .Where(i => i.evaOrganizationID == orgID && i.ID != currentInstructor).ToList();
+            List<evaInstructor> colaboratos = orgCourse.colaborators.ToList();
+            ViewBag.colaboratorID = new SelectList(instructores.Except(colaboratos, new evaBaseUserComparer())
+                , "ID", "fullName");
+
+            return View(orgCourse);
+        }
+        //add a colaborator to an organization course.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> addColaborator(int evaOrganizationCourseID, int colaboratorID)
+        {
+            evaOrganizationCourse orgCourse = db.evaOrganizationCourses.Find(evaOrganizationCourseID);
+            evaInstructor colaborator = db.evaInstructor.Find(colaboratorID);
+            orgCourse.colaborators.Add(colaborator);
+            db.SaveChanges();
+
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
+            int currentInstructor = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
+            //redirect to the view
+            return RedirectToAction("viewColaborators", new { courseID = orgCourse.course.CourseID/*, organizationAreaID = 1*/});
+        }
+
+        //remove colaborator
+        // GET: Courses/removeColaborator?evaorganizationcourseId & colaboratorID
+        //TODO: this action does not have forgery validation because its not a posted form
+        public ActionResult removeColaborator(int evaOrganizationCourseID, int colaboratorID)
+        {
+            evaOrganizationCourse orgCourse = db.evaOrganizationCourses
+                .Include(m => m.colaborators)
+                .SingleOrDefault(m => m.evaOrganizationCourseID == evaOrganizationCourseID);
+            evaInstructor colaborator = db.evaInstructor.Find(colaboratorID);
+            //remove the given colaborator from the organization course
+            orgCourse.colaborators.Remove(colaborator);
+            db.SaveChanges();
+            //TODO: design a way to handle the organization area filter
+            return RedirectToAction("viewColaborators", new { courseID = orgCourse.course.CourseID/*, organizationAreaID = 1*/});
+        }
+
+        //create an external course
         // GET: Courses/Create
-        public ActionResult Create(int? organizationAreaID)
+        public async Task<ActionResult> Create(int? organizationAreaID)
         {
             //populate the list of available areas for the course
             //what defines the course is external is the area of origin of the course
+            int orgID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
             ViewBag.isExternal = false;
             evaOrganizationArea currentArea;
             if (organizationAreaID != null)
@@ -108,7 +205,8 @@ namespace carEVA.Controllers
                 ViewBag.originAreaID = new SelectList(db.evaOrganizationAreas
                     , "evaOrganizationAreaID", "name", currentArea.evaOrganizationAreaID);
             }
-            
+            ViewBag.evaColaboratorID = new SelectList(db.evaInstructor
+                .Where(m => m.evaOrganizationID == orgID), "ID", "fullName");
             return View();
         }
 
@@ -136,7 +234,7 @@ namespace carEVA.Controllers
                 //and the organization course structure
                 try
                 {
-                    course.evaInstructorID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
+                    course.createdByID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
                     //some default values for the organization course
                     orgCourse.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
                     course.organizationCourse = new List<evaOrganizationCourse>() {orgCourse};

@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using carEVA.Models;
 using Microsoft.AspNet.Identity.EntityFramework;
+using carEVA.Utils;
 
 namespace carEVA.Controllers
 {
@@ -18,15 +19,20 @@ namespace carEVA.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        private carEVAContext db;
 
         public AccountController()
         {
+            db = new carEVAContext();
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager
+            , ApplicationSignInManager signInManager,
+            carEVAContext _dbContext)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            db = _dbContext;
         }
 
         public ApplicationSignInManager SignInManager
@@ -73,23 +79,70 @@ namespace carEVA.Controllers
             {
                 return View(model);
             }
+            string[] userAndDomain = model.Email.Split('@');
+            evaSignInManager evaManager = new evaSignInManager(db, SignInManager);
+            evaLogIn _evaLogIn = new evaLogIn{user = userAndDomain[0]
+                , domain = userAndDomain[1], passKey = model.Password };
+            evaSignInResult authResult = await evaManager.signInOrganizationUser(_evaLogIn, false);
+            switch (authResult)
+            {
+                case evaSignInResult.Success:
+                    //break inmediatly so it does not check for other conditions
+                    break;
+                case evaSignInResult.LockedOut:
+                    return View("Lockout");
+                case evaSignInResult.RequiresVerification:
+                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+                case evaSignInResult.Failure:
+                    ModelState.AddModelError("", "Usuario o contraseña invalido");
+                    return View(model);
+                case evaSignInResult.FailedCreateFromInconsistency:
+                case evaSignInResult.FailedToUpdateAspPassword:
+                    ModelState.AddModelError("", "Error del sistema al autenticar");
+                    return View(model);
+                case evaSignInResult.disabledAccount:
+                    ModelState.AddModelError("", "la cuenta se encuentra deshabilitada");
+                    return View(model);
+                    break;
+                default:
+                    ModelState.AddModelError("", "Error de sistema no definido");
+                    return View(model);
+            }
+
+            try
+            {
+                //creates a new user or updates its public key
+                await db.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                //report the service client that the key they are using is invalid.
+                evaLogUtils.logErrorMessage("cannot create eva user ",
+                    _evaLogIn.userAndDomain, e, this.ToString(), nameof(this.Login));
+                ModelState.AddModelError("", "ERROR : 400, cannot create eva user");
+                return View(model);
+            }
+
+            //if we end up here the login attempt was succesfull
+            return RedirectToLocal(returnUrl);
+
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-            }
+            //var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
+            //switch (result)
+            //{
+            //    case SignInStatus.Success:
+            //        return RedirectToLocal(returnUrl);
+            //    case SignInStatus.LockedOut:
+            //        return View("Lockout");
+            //    case SignInStatus.RequiresVerification:
+            //        return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
+            //    case SignInStatus.Failure:
+            //    default:
+            //        ModelState.AddModelError("", "Invalid login attempt.");
+            //        return View(model);
+            //}
         }
 
         //

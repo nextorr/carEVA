@@ -51,6 +51,12 @@ namespace carEVA.Models
             //base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<evaOrganizationCourse>().HasRequired(p => p.originArea).WithMany(m => m.organizationCourses).WillCascadeOnDelete(false);
             //modelBuilder.Entity<audiencePerCourse>().HasRequired(p => p.evaOrganizationCourse).WithMany(m => m.audienceAreas).WillCascadeOnDelete(false);
+            //force the table name of the colaborator Join Table
+            modelBuilder.Entity<evaOrganizationCourse>()
+                .HasMany(u => u.colaborators)//orgCourse
+                .WithMany(u => u.colaboratorOf)//instructor
+                .Map(u => u.MapRightKey("Colaborator_evaOrganizationCourseID")
+                .MapLeftKey("ColaboratorOf_evaInstructorID").ToTable("organizationCourseColaborators"));
         }
 
     }

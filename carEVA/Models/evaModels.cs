@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.Linq;
 using System.Web;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace carEVA.Models
 {
@@ -36,9 +37,10 @@ namespace carEVA.Models
         public int totalPoints { get; set; }
         public int evaImageID { get; set; }
         public virtual evaImage image { get; set; }
-        //owner of the course
-        public int evaInstructorID { get; set; }
-        public virtual evaInstructor instructor { get; set; }
+        //OWNER of the course
+        public int createdByID { get; set; }
+        [ForeignKey("createdByID")]
+        public virtual evaInstructor createdBy { get; set; }
         //navigation properties: this allows me to call info from this classes
         //directly inside views or controllers
         public virtual ICollection<Chapter> Chapters { get; set; }
@@ -46,6 +48,7 @@ namespace carEVA.Models
         public virtual ICollection<evaCourseEnrollment> enrollments { get; set; }
         public virtual ICollection<evaOrganizationCourse> organizationCourse { get; set; }
     }
+    
     public class Chapter
     {
         public int ChapterID { get; set; }

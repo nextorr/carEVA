@@ -1,0 +1,134 @@
+﻿@model carEVA.ViewModels.CourseProfileViewModel
+
+<p>
+    
+    @switch (Model.profileType)
+    {
+        case carEVA.ViewModels.courseProfileTypes.internalCourse:
+            <h2>Mis Cursos Internos</h2>
+            @Html.ActionLink("Nuevo Curso", "Create", "Courses")
+            break;
+        case carEVA.ViewModels.courseProfileTypes.externalCourse:
+            <h2>Mis Cursos Externos</h2>
+            if (Model.organizationAreaID != null)
+            {
+                @Html.ActionLink("Nuevo Curso", "Create", "Courses", new { organizationAreaID = Model.organizationAreaID }, null)
+            }
+            break;
+        case carEVA.ViewModels.courseProfileTypes.sharedCourse:
+            <h2> Cursos Compartidos Conmigo</h2>
+        break;
+        case carEVA.ViewModels.courseProfileTypes.assistantCourse:
+            <h2> Asistente de </h2>
+        break;
+        default:
+        break;
+    }
+ </p>
+
+    <table class="table">
+    <tr>
+    @*<th>
+            @Html.DisplayNameFor(model => model.createdBy.userName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.image.imageName)
+        </th>*@
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().title)
+    </th>
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().description)
+    </th>
+    @*<th>
+            @Html.DisplayNameFor(model => model.commitmentHoursPerDay)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.commitmentHoursTotal)
+        </th>*@
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().commitmentDays)
+    </th>
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().totalQuizes)
+    </th>
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().totalLessons)
+    </th>
+    <th>
+        @Html.DisplayNameFor(model => model.myCourse.FirstOrDefault().totalPoints)
+    </th>
+    <th></th>
+    </tr>
+
+    @foreach (var item in Model.myCourse)
+    {
+    <tr>
+        @*<td>
+                @Html.DisplayFor(modelItem => item.createdBy.userName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.image.imageName)
+            </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.description)
+        </td>
+        @*<td>
+                @Html.DisplayFor(modelItem => item.commitmentHoursPerDay)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.commitmentHoursTotal)
+            </td>*@
+        <td>
+            @Html.DisplayFor(modelItem => item.commitmentDays)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalQuizes)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalLessons)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.totalPoints)
+        </td>
+        <td>
+            @switch (Model.profileType)
+            {
+                case carEVA.ViewModels.courseProfileTypes.internalCourse:
+                case carEVA.ViewModels.courseProfileTypes.externalCourse:
+                    <text>
+                        @* they are all intended to be server by the course controller *@
+                        @Html.ActionLink("Editar", "Edit", new { id = item.CourseID }) |
+                        @*@Html.ActionLink("Details", "Details", new { id=item.CourseID }) |*@
+                        @Html.ActionLink("Eliminar", "Delete", new { id = item.CourseID }) |
+                        @Html.ActionLink("Capitulos", "index", "chapters", new { courseid = item.CourseID }, null) |
+                        @Html.ActionLink("Archivos", "index", "file", new { courseid = item.CourseID }, null)
+                        @Html.ActionLink("Colaboradores", "viewColaborators", "Courses", new { courseid = item.CourseID }, null)
+                    </text>
+                    break;
+                case carEVA.ViewModels.courseProfileTypes.sharedCourse:
+                    <text>
+                        @* they are all intended to be server by the course controller *@
+                        @Html.ActionLink("Editar", "Edit", new { id = item.CourseID }) |
+                        @*@Html.ActionLink("Details", "Details", new { id=item.CourseID }) |*@
+                        @Html.ActionLink("Capitulos", "index", "chapters", new { courseid = item.CourseID }, null) |
+                        @Html.ActionLink("Archivos", "index", "file", new { courseid = item.CourseID }, null)
+                    </text>
+                    break;
+                case carEVA.ViewModels.courseProfileTypes.assistantCourse:
+                    <text>
+                        @* they are all intended to be server by the course controller *@
+                        @*@Html.ActionLink("Details", "Details", new { id=item.CourseID }) |*@
+                        @Html.ActionLink("Capitulos", "index", "chapters", new { courseid = item.CourseID }, null) |
+                    </text>
+                    break;
+                default:
+                    throw new InvalidOperationException("invalid use of _courseListRole Partial View");
+            }
+        </td>
+    </tr>
+    }
+    </table>

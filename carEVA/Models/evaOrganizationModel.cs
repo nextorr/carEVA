@@ -113,5 +113,39 @@ namespace carEVA.Models
         [ForeignKey("originAreaID")]
         public virtual evaOrganizationArea originArea { get; set; }
         public virtual ICollection<evaOrgCourseAreaPermissions> audienceAreas { get; set; }
+        //instructor and colaborators of the course
+        public int evaInstructorID { get; set; }
+        [ForeignKey("evaInstructorID ")]
+        public virtual evaInstructor instructor { get; set; }
+        public virtual ICollection<evaInstructor> colaborators { get; set; }
+        //public virtual ICollection<evaInstructor> assistants { get; set; }
     }
+    //*********************************************************************************************
+    //comparator interface to allow union operations
+    public class evaOrganizationCourseComparer : IEqualityComparer<evaOrganizationCourse>
+    {
+        public bool Equals(evaOrganizationCourse x, evaOrganizationCourse y)
+        {
+            //return true if they reference the same object in memory
+            if (Object.ReferenceEquals(x, y)) return true;
+
+            //check only ID as two distinct courses cant have the same ID
+            //compare also the title just to make sure
+            return x != null 
+                && y != null 
+                && x.evaOrganizationCourseID.Equals(y.evaOrganizationCourseID)
+                && x.creationDate.Equals(y.creationDate);
+        }
+
+        public int GetHashCode(evaOrganizationCourse obj)
+        {
+            //get has code of ID 
+            int hashOrgCourseID = obj.evaOrganizationCourseID.GetHashCode();
+            int hashCreationDate = obj.creationDate.ToString() == null 
+                ? 0 : obj.creationDate.ToString().GetHashCode();
+
+            return hashOrgCourseID ^ hashCreationDate;
+        }
+    }
+    //*********************************************************************************************
 }

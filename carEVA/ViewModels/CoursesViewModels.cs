@@ -17,4 +17,16 @@ namespace carEVA.ViewModels
         public bool isInternal { get { return !organizationInfo.originArea.isExternal; } }
 
     }
+    //*********************************************************************************************
+    public enum courseProfileTypes
+    {
+        internalCourse, externalCourse, sharedCourse, assistantCourse 
+    }
+    public class CourseProfileViewModel
+    {
+        public IEnumerable<Course> myCourse { get; set; }
+        public int? organizationAreaID { get; set; }
+        public courseProfileTypes profileType { get; set; }
+    }
+    //*********************************************************************************************
 }

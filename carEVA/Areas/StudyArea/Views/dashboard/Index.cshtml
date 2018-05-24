@@ -1,0 +1,140 @@
+﻿@{
+    ViewBag.Title = "Panel";
+}
+
+@section HeadStyles{
+    @Styles.Render("~/Content/css/ControlPanel")
+    @Styles.Render("~/Content/Slick/css")
+}
+
+@section HeadScripts{
+}
+
+<h2>Panel de Control</h2>
+
+<script type="text/x-kendo-template" id="menu-item">
+    <li>
+        <div class="eva-panel-list-container">
+            <img class="eva-section-icon" src="/Content/images/#=imageName#" />
+            <p class="eva-section-title">#= Title#</p>
+            <div class="eva-clear-float"></div>
+            <p class="eva-section-line">#= TextA#</p>
+            <p class="eva-section-data">0</p>
+            <p class="eva-section-line">#= TextB#</p>
+            <p class="eva-section-data">0</p>
+            <div class="eva-clear-float"></div>
+        </div>
+    </li>
+</script>
+
+<script type="text/x-kendo-template" id="main-layout-template">
+    <div id="left-menu-anchor" class="eva-left-menu"></div>
+    <div id ="right-menu-anchor"class="eva-rigth-content-view"></div>
+    <div class="eva-clear-float"></div>
+</script>
+
+<script type="text/x-kendo-template" id="left-menu-template">
+    <p>Escuela Virtual Ambiental</p>
+    <ul id="eva-panel"
+        class="eva-panel-selection"
+        data-role="listview"
+        data-bind="source: items,  events: {change: onChange}"
+        data-selectable="multiple"
+        data-template="menu-item"></ul>
+</script>
+
+<script type="text/x-kendo-template" id="right-welcome-page-template">
+    <p>Bienvenido a EVA</p>
+    <div class="eva-main-slider">
+        <div><img class="eva-panel-slider-image" src="/Content/images/eva_banner_2.jpg" /></div>
+        <div><img class="eva-panel-slider-image" src="/Content/images/logos Eva-----07.jpg" /></div>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="right-myCourses-page-template">
+    <p>Listado de cursos inscritos</p>
+    <ul id="eva-myCourses"
+        class="eva-myCourses-grid">
+        <li>
+            <div class="eva-course-catalog-card">
+                <img src="/Content/images/eva_logo_shadow.png" />
+                <h3>Titulo del curso</h3>
+                <p>Descripcion corta pero consisa del curso que se ofrece</p>
+                <div class="eva-card-panel panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Dedicación</h3>
+                    </div>
+                    <div class="panel-body">
+                        10/10
+                    </div>
+                </div>
+                <div class="eva-card-panel panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Número de Videos</h3>
+                    </div>
+                    <div class="panel-body">
+                        35
+                    </div>
+                </div>
+                <div class="eva-clear-float"></div>
+            </div>
+
+            <div class="eva-course-catalog-card">
+                <img src="/Content/images/eva_logo_shadow.png" />
+                <h3>Titulo del curso</h3>
+                <p>Descripcion corta pero consisa del curso que se ofrece</p>
+                <div class="eva-card-panel panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Dedicación</h3>
+                    </div>
+                    <div class="panel-body">
+                        10/10
+                    </div>
+                </div>
+                <div class="eva-card-panel panel panel-success">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Número de Videos</h3>
+                    </div>
+                    <div class="panel-body">
+                        35
+                    </div>
+                </div>
+                <div class="eva-clear-float"></div>
+            </div>
+
+        </li>
+    </ul>
+</script>
+<script type="text/x-kendo-template" id="right-courseCatalog-page-template">
+    <p>Cursos Disponibles</p>
+</script>
+<script type="text/x-kendo-template" id="right-requiredCourses-page-template">
+    <p>Cursos Obligatorios</p>
+</script>
+
+@* start of visible elements *@
+<div id="eva-control-panel-main-layout-anchor"></div>
+
+
+@*<div class="eva-left-menu">
+    <p>Escuela Virtual Ambiental</p>
+    <ul id="eva-panel"
+        class="eva-panel-selection"
+        data-role="listview"
+        data-bind="source: items,  events: {change: onChange}"
+        data-selectable="multiple"
+        data-template="menu-item"></ul>
+</div>
+
+<div class="eva-rigth-content-view">
+    <p>Bienvenido a EVA</p>
+    <div class="eva-main-slider">
+        <div><img class="eva-panel-slider-image" src="~/Content/images/eva_banner_2.jpg" /></div>
+        <div><img class="eva-panel-slider-image" src="~/Content/images/logos Eva-----07.jpg" /></div>
+    </div>
+</div>*@
+
+
+@section FootScripts{
+    @Scripts.Render("~/bundles/ControlPanel")
+}

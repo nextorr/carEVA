@@ -80,7 +80,7 @@ namespace carEVA.Controllers.API
 
             evaSignInManager evaManager = new evaSignInManager(db
                 , HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>());
-            evaSignInResult authResult = await evaManager.signInUser(evaLogIn);
+            evaSignInResult authResult = await evaManager.signInOrganizationUser(evaLogIn, true);
             switch (authResult)
             {
                 case evaSignInResult.Success:
@@ -96,6 +96,8 @@ namespace carEVA.Controllers.API
                     return BadRequest("Sistem error trying to authenticate");
                 case evaSignInResult.FailedToUpdateAspPassword:
                     return BadRequest("Sistem error trying to authenticate");
+                case evaSignInResult.disabledAccount:
+                    return BadRequest("the Account is disabled");
                 default:
                     return BadRequest("General system error");
             }
@@ -109,7 +111,7 @@ namespace carEVA.Controllers.API
             {
                 //report the service client that the key they are using is invalid.
                 evaLogUtils.logErrorMessage("cannot create eva user ",
-                    evaLogIn.user, e, this.ToString(), nameof(this.GetevaLogIn));
+                    evaLogIn.userAndDomain, e, this.ToString(), nameof(this.GetevaLogIn));
                 return BadRequest("ERROR : 400, cannot create eva user");
             }
 

@@ -1,0 +1,35 @@
+﻿@model carEVA.Models.evaOrganizationCourse
+@{
+    ViewBag.Title = "Agregar colaborador";
+}
+
+<h2>Agregar colaborador</h2>
+<p>curso: @ViewBag.courseTitle</p>
+<p>Seleccione el instructor de la lista y luego selecciona agregar para configurarlo como colabrador</p>
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.evaOrganizationCourseID)
+        <div class="form-group">
+            @Html.Label("Seleccione el Instructor", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("colaboratorID", null, htmlAttributes: new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Agregar" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    @Html.ActionLink("Regresar", "viewColaborators", new {courseID = Model.course.CourseID});
+}
+
+ 

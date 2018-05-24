@@ -42,8 +42,11 @@ namespace carEVA.Utils
         //
         // This is a system failure as everithing worked ok 
         // but updating the password on aspnet failed
-        FailedToUpdateAspPassword = 5
-
+        FailedToUpdateAspPassword = 5,
+        //
+        // the account has been disabled at the eva level
+        // still all the data exists on the DB
+        disabledAccount = 6
     }
     //*********************************************************************************************
     public class evaSignInManager
@@ -52,7 +55,9 @@ namespace carEVA.Utils
         private ApplicationSignInManager signInManager;
         UserManager<ApplicationUser> manager;
         private evaDataProtectionProvider provider;
-        public string publicKey { get; set; }
+        //currently selected user
+        private evaBaseUser workingUser;
+        public string publicKey { get; private set; }
         private sidcarUserServiceReference.WSIntegracionSoapClient sidcarProxy = new sidcarUserServiceReference.WSIntegracionSoapClient();
         //private class to handle the response and error from the SIDCAR service
         //---------------------------------------------------------------------------------------------
@@ -71,19 +76,61 @@ namespace carEVA.Utils
             provider = new evaDataProtectionProvider();
         }
         //---------------------------------------------------------------------------------------------
-        public async Task<evaSignInResult> signInUser(evaLogIn _evaLogIn)
+        /// <summary>
+        /// loads into workingUsers the current user the class has reference to
+        /// </summary>
+        /// <param name="userName">the full username with domain of the user</param>
+        private void loadUser(string userName) {
+            workingUser = db.evaBaseUser.Where(m => m.userName == userName).SingleOrDefault();
+        }
+        //---------------------------------------------------------------------------------------------
+        public async Task<evaSignInResult> signInOrganizationUser(evaLogIn _evaLogIn, bool updatePublicKey)
+        {
+            //load the working user
+            loadUser(_evaLogIn.userAndDomain);
+
+            if (!workingUser.isActive) {
+                //return inmediately if the user is inactive.
+                return evaSignInResult.disabledAccount;
+            }
+            //create a new or keep the existing public key
+            if (updatePublicKey)
+            {
+                publicKey = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                publicKey = workingUser.publicKey;
+            }
+            //plug in here the different login provider to integrate to authentication systems
+            //depending on the organization
+            switch (_evaLogIn.domain)
+            {
+                case "car.gov.co":
+                    return await signInSIDCAR(_evaLogIn);
+                default:
+                    evaLogUtils.logWarningMessage("non existing domain logIn attempt " 
+                        + _evaLogIn.userAndDomain + " Exist in ASP logins but not on evaLogIns"
+                        ,this.ToString(), nameof(this.signInOrganizationUser));
+                    return evaSignInResult.Failure;
+            }
+        }
+        //---------------------------------------------------------------------------------------------
+        public async Task<evaSignInResult> signInSIDCAR(evaLogIn _evaLogIn)
         {
             //attempt to log ing using the MVC identity system, this is expected to work once the user is created
             //and will validate login even if there is a problem with the SIDCAR service.
             //append the car.gov.co suffix to the username.
-            publicKey = Guid.NewGuid().ToString();
             var resultSIM = await signInManager.PasswordSignInAsync((_evaLogIn.userAndDomain), _evaLogIn.passKey, false, shouldLockout: false);
             userServiceResponse evaBaseUserFromAsp;
+            //from the start check if the user is active on the eva model
+
             switch (resultSIM)
             {
                 case SignInStatus.Success:
                     //its an existing user, so update the public key.
-                    bool updateResult = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                    //bool updateResult = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                    bool updateResult = updateUserPublicKey();
                     if (!updateResult)
                     {
                         //this is model inconsistency: the user exist in aspNetUsers but not on evaUsers
@@ -95,7 +142,7 @@ namespace carEVA.Utils
                             db.evaBaseUser.Add(evaBaseUserFromAsp.userInfo);
                             evaLogUtils.logWarningMessage("model inconsistency, user " + _evaLogIn.userAndDomain +
                                                             " Exist in ASP logins but not on evaLogIns",
-                                                            this.ToString(), nameof(this.signInUser));
+                                                            this.ToString(), nameof(this.signInSIDCAR));
                         }
                         else
                         {
@@ -116,7 +163,8 @@ namespace carEVA.Utils
                         //the user exists, so is an incorrect password on ASP
                         //here maybe the user updated the password on sidcar so try to sync the password
                         //first check if the user exist in the eva model
-                        int x = await db.evaUsers.Where(l => l.userName == (_evaLogIn.userAndDomain)).CountAsync();
+                        //check for all the user types, as in the model definition all types can login
+                        int x = await db.evaBaseUser.Where(l => l.userName == (_evaLogIn.userAndDomain)).CountAsync();
                         if (x <= 0)
                         {
                             //this is model inconsistency: the user exist in aspNetUsers but not on evaUsers
@@ -128,7 +176,7 @@ namespace carEVA.Utils
                                 db.evaBaseUser.Add(evaBaseUserFromAsp.userInfo);
                                 evaLogUtils.logWarningMessage("model inconsistency, user " + _evaLogIn.userAndDomain +
                                                                 " Exist in ASP logins but not on evaLogIns",
-                                                                this.ToString(), nameof(this.signInUser));
+                                                                this.ToString(), nameof(this.signInSIDCAR));
                             }
                             else
                             {
@@ -152,20 +200,21 @@ namespace carEVA.Utils
                                 {
                                     evaLogUtils.logErrorMessage("Could not update password from SIDCAR: " 
                                         + _evaLogIn.userAndDomain,
-                                        this.ToString(), nameof(this.signInUser));
+                                        this.ToString(), nameof(this.signInSIDCAR));
                                     return evaSignInResult.FailedToUpdateAspPassword;
                                 }
                                 IdentityResult pwResult = await manager.ResetPasswordAsync(aspUser.Id, resetToken, _evaLogIn.passKey);
                                 if (!pwResult.Succeeded)
                                 {
                                     evaLogUtils.logErrorMessage("Could not update password from SIDCAR: " + _evaLogIn.userAndDomain,
-                                                this.ToString(), nameof(this.signInUser));
+                                                this.ToString(), nameof(this.signInSIDCAR));
                                     return evaSignInResult.FailedToUpdateAspPassword;
                                 }
                                 else
                                 {
                                     //if the result succeed, update the user public key
-                                    bool updatePK = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                                    //bool updatePK = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                                    bool updatePK = updateUserPublicKey();
                                 }
                             }
                             else
@@ -210,6 +259,8 @@ namespace carEVA.Utils
         //---------------------------------------------------------------------------------------------
         public async Task<evaSignInResult> signInExternalUser(evaLogIn _evaLogIn)
         {
+            //load the working user
+            loadUser(_evaLogIn.userAndDomain);
             //since this is an External user, the authentication is done exclusevely using 
             //the ASP net identity system
             publicKey = Guid.NewGuid().ToString();
@@ -218,7 +269,8 @@ namespace carEVA.Utils
             {
                 case SignInStatus.Success:
                     //its an existing user, so update the public key.
-                    bool updateResult = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                    //bool updateResult = updateUserPublicKey(_evaLogIn.user, _evaLogIn.domain, publicKey);
+                    bool updateResult = updateUserPublicKey();
                     if (!updateResult)
                     {
                         //Cannot update the public key, the user exist on AspNetUsers but not on eva
@@ -266,6 +318,7 @@ namespace carEVA.Utils
             return null;
         }
         //---------------------------------------------------------------------------------------------
+        //TODO: marked to delete.
         /// <summary>
         /// method to update the public key for a given user, note this does not persist changes in database
         /// </summary>
@@ -274,14 +327,14 @@ namespace carEVA.Utils
         {
             //exclude instructors from this query as they cannot take courses
             //exclude inactive users
-            evaBaseUser originalUser = db.evaBaseUser.Where(l => l.userName == (userName+ "@" + domain)
-                        && !(l is evaInstructor))
-                        .Where(l => l.isActive).SingleOrDefault();
-            if (originalUser != null)
+            //query base users because we want all user types except for instructors.
+            workingUser = db.evaBaseUser.Where(l => l.userName == (userName+ "@" + domain)
+                        && !(l is evaInstructor)).SingleOrDefault();
+            if (workingUser != null)
             {
-                originalUser.publicKey = publicKey;
+                workingUser.publicKey = publicKey;
                 evaLogUtils.logInfoMessage("renewed Public key for user: " + userName,
-                    this.ToString(), nameof(this.signInUser));
+                    this.ToString(), nameof(this.signInSIDCAR));
                 //the operation succeded
                 return true;
             }
@@ -289,6 +342,25 @@ namespace carEVA.Utils
             return false;
         }
         //---------------------------------------------------------------------------------------------
+        /// <summary>
+        /// utilize all the internal variables, initializated at the start to update keys.
+        /// </summary>
+        /// <returns></returns>
+        private bool updateUserPublicKey()
+        {
+            //if the working user is null the login provider decides what to do
+            if (workingUser != null)
+            {
+                workingUser.publicKey = publicKey;
+                evaLogUtils.logInfoMessage("renewed Public key for user: " + workingUser.userName,
+                    this.ToString(), nameof(this.signInSIDCAR));
+                //the operation succeded
+                return true;
+            }
+            //the operation failed, no valid user found on the eva model
+            return false;
+        }
+
         //---------------------------------------------------------------------------------------------
         /// <summary>
         /// Calls the SIDCAR service and return the information for the given username and pass. if it fails 

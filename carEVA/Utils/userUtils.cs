@@ -37,14 +37,15 @@ namespace carEVA.Utils
         public static async Task<int> organizationIdFromAspIdentity(carEVAContext context, string aspUserID)
         {
             //TODO: check base user change stability
-            evaUser currentUser = await context.evaUsers.Where(u => u.aspnetUserID == aspUserID).FirstOrDefaultAsync();
+            //As dic 2017 the evaModel only allows one base user type per ASP.NET key
+            evaBaseUser currentUser = await context.evaBaseUser.Where(u => u.aspnetUserID == aspUserID).FirstOrDefaultAsync();
             return currentUser.evaOrganizationID;
         }
         //---------------------------------------------------------------------------------------------
         public static evaOrganizationArea areaFromAspIdentity(carEVAContext context, string aspUserID)
         {
             //TODO: check base user change stability
-            evaUser currentUser = context.evaUsers.Where(u => u.aspnetUserID == aspUserID).Single();
+            evaBaseUser currentUser = context.evaBaseUser.Where(u => u.aspnetUserID == aspUserID).Single();
             return currentUser.organizationArea;
         }
         //---------------------------------------------------------------------------------------------

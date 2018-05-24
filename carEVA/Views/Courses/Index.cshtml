@@ -1,81 +1,10 @@
-﻿@model IEnumerable<carEVA.ViewModels.CoursesViewModels>
+﻿@model IEnumerable<carEVA.ViewModels.CourseProfileViewModel>
 
 @{
     ViewBag.Title = "Cursos";
 }
-@if (!ViewBag.isExternal)
+
+@foreach (var item in Model)
 {
-    <h2>Mis Cursos Internos</h2>
-    <p>
-        @Html.ActionLink("Nuevo Curso", "Create")
-    </p>
+    Html.RenderPartial("_courseListRoleControls", item);
 }
-else
-{
-    <h2>Mis Cursos Externos</h2>
-    <p>
-        @Html.ActionLink("Nuevo Curso Externo", "Create", new {organizationAreaID = ViewBag.organizationAreaID })
-    </p>
-}
-
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.course.title)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.commitmentDays)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.commitmentHoursPerDay)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.totalQuizes)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.totalLessons)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.course.totalPoints)
-        </th>
-        <th></th>
-    </tr>
-
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.title)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.commitmentDays)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.commitmentHoursPerDay)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.totalQuizes)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.totalLessons)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.course.totalPoints)
-        </td>
-        <td>
-            @Html.ActionLink("Editar", "Edit", new { id=item.course.CourseID }) |
-            @*@Html.ActionLink("Details", "Details", new { id=item.CourseID }) |*@
-            @Html.ActionLink("Eliminar", "Delete", new { id=item.course.CourseID }) |
-            @Html.ActionLink("Capitulos", "index","chapters", new { courseid = item.course.CourseID },null) |
-            @Html.ActionLink("Archivos", "index", "file", new { courseid = item.course.CourseID }, null)
-            
-        </td>
-    </tr>
-}
-
-</table>

@@ -1,0 +1,105 @@
+﻿.eva-left-menu {
+    border: 2px solid rgb(0,65,101);
+    float:left;
+    padding:4px;
+    width:20%;
+}
+
+.eva-rigth-content-view {
+    border: 2px solid rgb(0,65,101);
+    padding:4px;
+    width:80%;
+    float:left;
+}
+
+.eva-left-menu ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.eva-rigth-content-view ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.eva-panel-list-container {
+    border-top: 2px solid lightGray;
+    margin-bottom:4px;
+}
+
+.eva-section-icon {
+    float:left;
+    height:55px;
+    width:auto;
+}
+
+.eva-section-title {
+    float:left;
+    font-weight:bold;
+}
+
+.eva-section-line {
+    float:left;
+    border-bottom: 2px solid Gray;
+    margin-right:2px;
+    margin-left:2px;
+    padding-bottom:4px;
+}
+
+.eva-section-data {
+    float:left;
+    border: 2px solid rgb(0,65,101);
+    background:dodgerblue;
+    color:white;
+    padding:2px;
+    font-weight:bold;
+    border-radius: 25px;
+}
+
+.eva-main-slider {
+    margin-left:25px;
+    margin-right:25px;
+}
+.eva-panel-slider-image {
+    height:525px;
+}
+
+.slick-prev:before, .slick-next:before { 
+    color:black !important;
+}
+
+
+.eva-clear-float{
+    clear: both;
+}
+
+/*course catalog card section*/
+.eva-course-catalog-card {
+    margin-left:4px;
+    margin-right:4px;
+    float:left;
+    border: 2px solid rgb(0,65,101);
+    width:400px;
+    padding:4px;
+}
+
+.eva-course-catalog-card img {
+    float:left;
+    width:50px;
+}
+
+.eva-course-catalog-card h3 {
+    font-weight:bold;
+}
+
+.eva-course-catalog-card p {
+    clear:both;
+    margin-top:32px;
+}
+
+.eva-card-panel {
+    float:left;
+    width:180px;
+    margin-right:10px;
+    text-align: center;
+}

@@ -13,9 +13,14 @@ namespace carEVA.Models
         public string altEmail { get; set; }
         //use this for contact information.
         public string mobileNumber { get; set; }
-        //TODO: implement area CAR, see if its better by name or ID
-        //the user can be associated with only one Organization
-        public virtual ICollection<Course> courses { get; set; }
+        //courses the instructor own
+        public virtual ICollection<Course> coursesOwned { get; set; }
+        public virtual ICollection<evaOrganizationCourse> instructorOf { get; set; }
+        [InverseProperty("colaborators")]
+        public virtual ICollection<evaOrganizationCourse> colaboratorOf { get; set; }
+        //[InverseProperty("assistants")]
+        //public virtual ICollection<evaOrganizationCourse> assistantOf { get; set; }
+
         public override string getIndexViewName
         {
             get

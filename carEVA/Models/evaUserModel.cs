@@ -110,6 +110,34 @@ namespace carEVA.Models
             }
         }
     }
+    //*********************************************************************************************
+    //comparator interface to the user model
+    public class evaBaseUserComparer : IEqualityComparer<evaBaseUser>
+    {
+        public bool Equals(evaBaseUser x, evaBaseUser y)
+        {
+            //return true if they reference the same object in memory
+            if (Object.ReferenceEquals(x, y)) return true;
+
+            //check the ID and username to make sure they are the same
+            //compare also the title just to make sure
+            return x != null
+                && y != null
+                && x.ID.Equals(y.ID)
+                && x.userName.Equals(y.userName);
+        }
+
+        public int GetHashCode(evaBaseUser obj)
+        {
+            //get has code of ID 
+            int hashBaseUserID = obj.ID.GetHashCode();
+            int hashBaseUserName = obj.userName== null
+                ? 0 : obj.userName.GetHashCode();
+
+            return hashBaseUserID ^ hashBaseUserName;
+        }
+    }
+    //*********************************************************************************************
 
     public class evaCourseEnrollment
     {

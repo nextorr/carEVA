@@ -1,0 +1,77 @@
+﻿@model IEnumerable<carEVA.Models.evaInstructor>
+
+@{
+    ViewBag.Title = "colaboradores";
+}
+
+<h2>Colaboradores del Curso</h2>
+
+<p>
+    @Html.ActionLink("Agregar Colaborador", "addColaborator", new {orgCourseID = ViewBag.organizationCourse.evaOrganizationCourseID }) | 
+
+    @if (Request.QueryString["organizationAreaID"] != null)
+    {
+        @Html.ActionLink("Regresar", "Index", new { organizationAreaID = Request.QueryString["organizationAreaID"] });
+    }
+    else
+    {
+        @Html.ActionLink("Regresar", "Index");
+    }
+
+
+</p>
+<table class="table">
+    <tr>
+        
+        <th>
+            @Html.DisplayNameFor(model => model.userName)
+        </th>
+       
+        <th>
+            @Html.DisplayNameFor(model => model.fullName)
+        </th>
+        
+        <th>
+            @Html.DisplayNameFor(model => model.areaCode)
+        </th>
+       
+        <th>
+            @Html.DisplayNameFor(model => model.altEmail)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.mobileNumber)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var colaborator in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => colaborator.userName)
+        </td>
+        
+        <td>
+            @Html.DisplayFor(modelItem => colaborator.fullName)
+        </td>
+        
+        <td>
+            @Html.DisplayFor(modelItem => colaborator.areaCode)
+        </td>
+        
+        <td>
+            @Html.DisplayFor(modelItem => colaborator.altEmail)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => colaborator.mobileNumber)
+        </td>
+        <td>
+            @Html.ActionLink("Remover", "removeColaborator", new
+               {
+                   evaOrganizationCourseID =  ViewBag.organizationCourse.evaOrganizationCourseID,
+                   colaboratorID = colaborator.ID
+               })
+        </td>
+    </tr>
+}
+
+</table>

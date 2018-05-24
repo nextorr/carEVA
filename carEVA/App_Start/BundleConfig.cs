@@ -8,6 +8,20 @@ namespace carEVA
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            //*******************Study Area bundles****************************
+            //include here the slick slider code
+            bundles.Add(new ScriptBundle("~/bundles/ControlPanel").Include(
+                        "~/Scripts/Slick/slick.js",
+                        "~/Areas/StudyArea/Scripts/ControlPanel.js"));
+
+            bundles.Add(new StyleBundle("~/Content/css/ControlPanel").Include(
+                      "~/Areas/StudyArea/Content/ControlPanel.css"));
+
+            //*******************slick slider bundles****************************
+            bundles.Add(new StyleBundle("~/Content/Slick/css").Include(
+                     "~/Content/Slick/slick.css",
+                     "~/Content/Slick/slick-theme.css"));
+
             //*******************JavaScript bundles****************************
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));
@@ -18,6 +32,11 @@ namespace carEVA
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryUI").Include(
                         "~/Scripts/jquery-ui-{version}.js"));
+
+            //adding the kendo scripts
+            bundles.Add(new ScriptBundle("~/bundles/kendoui").Include(
+                "~/Scripts/kendo/2018.2.516/kendo.ui.core.min.js",
+                "~/Scripts/kendo/2018.2.516/cultures/kendo.culture.es-CO.min.js"));
 
             //bundle the eva upload video helper
             bundles.Add(new ScriptBundle("~/bundles/evaVideoUpload").Include(
@@ -38,6 +57,11 @@ namespace carEVA
                       "~/Scripts/respond.js"));
 
             //*******************style bundles***********************************
+
+            //adding the kendo styles.
+            bundles.Add(new StyleBundle("~/Content/kendo/2018.2.516/css").Include(
+                     "~/Content/kendo/2018.2.516/kendo.common-material.min.css",
+                     "~/Content/kendo/2018.2.516/kendo.material.min.css"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
