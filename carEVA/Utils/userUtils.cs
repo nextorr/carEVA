@@ -25,6 +25,11 @@ namespace carEVA.Utils
         }
 
         //---------------------------------------------------------------------------------------------
+        public static string publicKeyFromUserId(carEVAContext context, string _aspNetUserID)
+        {
+            return context.evaBaseUser.Where(u => u.aspnetUserID == _aspNetUserID).Single().publicKey;
+        }
+        //---------------------------------------------------------------------------------------------
 
         public static int organizationIdFromKey(carEVAContext context, string publicKey)
         {

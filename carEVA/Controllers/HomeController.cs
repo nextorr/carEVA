@@ -13,6 +13,12 @@ namespace carEVA.Controllers
             return View();
         }
 
+        public ActionResult InstructorPanel()
+        {
+            ViewBag.Message = "Page for the instructors to create and manage courses";
+            return View();
+        }
+
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";
@@ -26,5 +32,7 @@ namespace carEVA.Controllers
 
             return View();
         }
+        
+
     }
 }

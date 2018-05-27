@@ -83,7 +83,17 @@ namespace carEVA.Controllers
             evaSignInManager evaManager = new evaSignInManager(db, SignInManager);
             evaLogIn _evaLogIn = new evaLogIn{user = userAndDomain[0]
                 , domain = userAndDomain[1], passKey = model.Password };
-            evaSignInResult authResult = await evaManager.signInOrganizationUser(_evaLogIn, false);
+            evaSignInResult authResult = new evaSignInResult();
+            switch (model.loginType)
+            {
+                case "internal":
+                    authResult = await evaManager.signInOrganizationUser(_evaLogIn, false);
+                    break;
+                case "external":
+                    authResult = await evaManager.signInExternalUser(_evaLogIn, false);
+                    break;
+
+            }
             switch (authResult)
             {
                 case evaSignInResult.Success:

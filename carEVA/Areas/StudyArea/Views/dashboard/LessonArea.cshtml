@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "LessonArea";
+}
+@Styles.Render("~/Content/css/LessonPanel")
+
+<h2>Panel del Curso</h2>
+
+<script type="text/x-kendo-template" id="main-layout-template">
+    <div id="left-panel-anchor" class="eva-left-menu"></div>
+    <div id="right-panel-anchor" class="eva-rigth-content-view"></div>
+    <div class="eva-clear-float"></div>
+</script>
+
+<script type="text/x-kendo-template" id="chapter-item-template">
+    <div class="eva-chapter-header">
+        <h4>capitulo #= chapter.index#</h4>
+        <p>#=chapter.title#</p>
+        @* define here the child list view *@
+        <div id="child-lesson-listview-#=chapter.index#" class="eva-lesson-list-container" data-evaselected="false"></div>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="lesson-item-template">
+    <div class="eva-lesson-list-item">
+        <div class="eva-image-indicator-container">
+            <img src="/Content/images/eva_icon_pending.png" />
+        </div>
+        <h5>#= info.title#</h5>
+        <p>#=info.description#</p>
+    </div>
+</script>
+
+<script type="text/x-kendo-template" id="resource-files-template">
+    <div><a href="" target="_blank" download data-bind="attr: { href: fileURL }"> <p>#= fileName#</p> </a></div>
+</script>
+
+<script type="text/x-kendo-template" id="question-item-template">
+    @* take into account that we denormalized the question property *@
+    # if (item.statement) { #
+    <p>#: item.statement #</p>
+    # } else {#
+    <input type="radio" name="#: item.QuestionID #" value="#: item.AnswerID #" id="#: item.AnswerID #">
+    <label for="#: item.AnswerID #"> #: item.text # </label>
+    #}#
+</script>
+
+<script type="text/x-kendo-template" id="left-lessons-template">
+    <p>Lecciones del Curso</p>
+    <div id="eva-chapters-panel"
+        class="eva-chapters-menu"></div>
+</script>
+
+
+
+<script type="text/x-kendo-template" id="right-course-welcome-template">
+    <p>Bienvenido al Curso de EVA</p>
+    <img class="eva-panel-slider-image" src="/Content/images/eva_banner_2.jpg" />
+</script>
+
+<script type="text/x-kendo-template" id="right-video-template">
+    <video id="eva-video" class="eva-video-lesson" controls="controls">
+        <source src="" type="video/mp4" /> 
+    </video>
+    <div id="tabstrip">
+        <ul>
+            <li class="k-state-active">
+                Recursos
+            </li>
+            <li>
+                Preguntas - Quiz
+            </li>
+            <li>
+                Contacto
+            </li>
+        </ul>
+        <div>
+            <p>Archivos</p>
+            <ul id="eva-resourceFiles"
+                class="eva-resourceFiles-List"
+                data-role="listview"
+                data-bind="source: fileItems"
+                data-template="resource-files-template"></ul>
+        </div>
+        <div>
+            <p>Quiz</p>
+            <div id="eva-quiz"
+                 class="eva-quiz-list"
+                 data-role="panelbar"
+                 data-template="question-item-template"
+                 data-bind="source: questionItems, events: { select: onSelect }"></div>
+        </div>
+        <div>
+            <p>Contacto con el profesor</p>
+        </div>
+    </div>
+</script>
+
+@* start of visible elements *@
+<div id="eva-lesson-panel-main-layout-anchor"></div>
+
+@*<p>Lecciones del Curso</p>
+<div id="eva-chapters-panel"
+     class="eva-chapters-menu"></div>*@
+
+@section FootScripts{
+    <script type="text/javascript">
+        var publicKey = "@ViewBag.publicKey"
+        var courseID = "@ViewBag.courseID"
+    </script>
+    @Scripts.Render("~/bundles/LessonPanel")
+}

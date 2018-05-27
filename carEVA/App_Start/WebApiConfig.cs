@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+
+using System.Net.Http;
+
 
 namespace carEVA
 {
@@ -12,6 +13,10 @@ namespace carEVA
     {
         public static void Register(HttpConfiguration config)
         {
+
+            // Web API configuration and services
+            config.EnableCors();
+
             // Web API configuration and services
             //use this configuration to ignore problems with circular references
             //this has to be set per serializer.

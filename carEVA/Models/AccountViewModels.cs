@@ -48,18 +48,20 @@ namespace carEVA.Models
 
     public class LoginViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
-        [EmailAddress]
+        [Required(ErrorMessage = "debe ingresar un usuario")]
+        [Display(Name = "Usuario")]
+        [EmailAddress(ErrorMessage = "ingrese el usuario con @car.gov.co")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "debe ingresar su contraseña")]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Contraseña")]
         public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Recordarme?")]
         public bool RememberMe { get; set; }
+
+        public string loginType { get; set; }
     }
 
     public class RegisterViewModel

@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Instructor Panel";
+}
+
+<h2>Panel Gestión Cursos</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Administrar cursos Internos</h2>
+        <p>
+            Cree y distribuya nuevos cursos para que entren en el catalogo y puedan ser consultados por los usuarios.
+        </p>
+        <p><a class="btn btn-default" href="@Url.Action("Index", "courses")">Crear &raquo;</a></p>
+    </div>
+    <div class="col-md-6">
+        <h2>Resultados y Auditoria</h2>
+        <p>Lleve un control de los cursos completados, que persona se encuentra certificada para que curso y mas</p>
+        <p><a class="btn btn-default" href="@Url.Action("Index", "home")">Consultar &raquo;</a></p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <h2>Gestion Externa</h2>
+        <p>
+            Gestione los cursos que se ofrecen al publico, administre listas de pre- inscripcion y las areas externas.
+        </p>
+        <p><a class="btn btn-default" href="@Url.Action("Index", "externalUsers")">Administre usuarios externos&raquo;</a></p>
+        <p><a class="btn btn-default" href="@Url.Action("Index", "ExternalAreas")">Administrar Area Externa &raquo;</a></p>
+    </div>
+</div>

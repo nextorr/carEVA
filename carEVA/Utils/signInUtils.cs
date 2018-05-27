@@ -257,13 +257,22 @@ namespace carEVA.Utils
             return evaSignInResult.Success;
         }
         //---------------------------------------------------------------------------------------------
-        public async Task<evaSignInResult> signInExternalUser(evaLogIn _evaLogIn)
+        public async Task<evaSignInResult> signInExternalUser(evaLogIn _evaLogIn, bool updatePublicKey)
         {
             //load the working user
             loadUser(_evaLogIn.userAndDomain);
             //since this is an External user, the authentication is done exclusevely using 
             //the ASP net identity system
             publicKey = Guid.NewGuid().ToString();
+            //create a new or keep the existing public key
+            if (updatePublicKey)
+            {
+                publicKey = Guid.NewGuid().ToString();
+            }
+            else
+            {
+                publicKey = workingUser.publicKey;
+            }
             var resultSIM = await signInManager.PasswordSignInAsync((_evaLogIn.userAndDomain), _evaLogIn.passKey, false, shouldLockout: false);
             switch (resultSIM)
             {

@@ -74,6 +74,8 @@ namespace carEVA.Controllers.API
                 try
                 {
                     currentDetail = detailList.Single();
+                    //eliminate thte lesson detail so the response its no cluttered and full of redundant data
+                    currentDetail.evaLessonDetail = null;
                 }
                 catch (InvalidOperationException e)
                 {

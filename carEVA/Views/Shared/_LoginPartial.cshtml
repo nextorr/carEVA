@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.Owin;
 @if (Request.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
@@ -7,14 +8,54 @@
 
     <ul class="nav navbar-nav navbar-right">
         <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+            @Html.ActionLink("Hola " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+
+        <li>
+            @{var userManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
+
+                if (userManager.GetRoles(User.Identity.GetUserId()).Count > 0)
+                {
+                    foreach (string item in userManager.GetRoles(User.Identity.GetUserId()))
+                    {
+                        //render the corresponding menu option, given the role the user is in
+                        //the roles are defined on the database
+                        switch (item)
+                        {
+                            case "Admin":
+                                <li>
+                                    @Html.ActionLink("Administrar", "Index", "Admin", routeValues: null, htmlAttributes: new { title = "Gestione Parametrización" })
+                                </li>
+                                break;
+                            case "Instructor":
+                                <li>
+                                    @Html.ActionLink("Gestión Cursos", "InstructorPanel", "Home", routeValues: null, htmlAttributes: new { title = "Gestione Cursos" })
+                                </li>
+
+                                break;
+                            case "User":
+                                //TODO:provide here a navigation point so the the courses, for any user role from any view that inherits the layout
+                                <li>
+                                    @Html.ActionLink("Mis Cursos", "Index", "Home", routeValues: new { Area = "StudyArea" }, htmlAttributes: new { title = "Gestione Cursos" })
+                                </li>
+                                break;
+                        }
+                    }
+                }
+            }
+    
+
+        @*TODO may 2018: at this point we are not assignin users to the UserRole.
+        provide here a navigation point so the the courses, for any user role from any view that inherits the layout*@
+        <li>
+            @Html.ActionLink("Mis Cursos", "Index", "dashboard", routeValues: new { Area = "StudyArea" }, htmlAttributes: new { title = "Gestione Cursos" })
+        </li>
+        <li><a href="javascript:document.getElementById('logoutForm').submit()">Cerrar Sesión</a></li>
     </ul>
     }
-}
-else
-{
+                        }
+                        else
+                        {
     <ul class="nav navbar-nav navbar-right">
         @*<li>@Html.ActionLink("Ingreso", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>*@
         <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>

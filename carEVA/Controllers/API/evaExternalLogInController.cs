@@ -53,7 +53,7 @@ namespace carEVA.Controllers.API
 
             evaSignInManager evaManager = new evaSignInManager(db
                 , HttpContext.Current.GetOwinContext().Get<ApplicationSignInManager>());
-            evaSignInResult authResult = await evaManager.signInExternalUser(evaLogIn);
+            evaSignInResult authResult = await evaManager.signInExternalUser(evaLogIn, true);
             switch (authResult)
             {
                 case evaSignInResult.Success:

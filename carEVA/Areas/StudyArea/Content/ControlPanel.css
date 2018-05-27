@@ -25,6 +25,7 @@
 .eva-panel-list-container {
     border-top: 2px solid lightGray;
     margin-bottom:4px;
+    cursor:pointer;
 }
 
 .eva-section-icon {
@@ -79,8 +80,14 @@
     margin-right:4px;
     float:left;
     border: 2px solid rgb(0,65,101);
+    border-radius: 10px;
     width:400px;
     padding:4px;
+    cursor:pointer;
+}
+
+.eva-course-catalog-card:hover {
+    background-color:rgb(240,240,240);
 }
 
 .eva-course-catalog-card img {
@@ -90,16 +97,26 @@
 
 .eva-course-catalog-card h3 {
     font-weight:bold;
+    overflow:hidden;
+    font-size:1em;
+    height:2em;
 }
 
 .eva-course-catalog-card p {
     clear:both;
-    margin-top:32px;
+    margin-top:16px;
 }
 
 .eva-card-panel {
     float:left;
     width:180px;
+    margin-right:10px;
+    text-align: center;
+}
+
+.eva-my-course-card-panel {
+    float:left;
+    width:120px;
     margin-right:10px;
     text-align: center;
 }

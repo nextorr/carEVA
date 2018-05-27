@@ -17,6 +17,12 @@ namespace carEVA
             bundles.Add(new StyleBundle("~/Content/css/ControlPanel").Include(
                       "~/Areas/StudyArea/Content/ControlPanel.css"));
 
+            //*******************Lesson Area bundles****************************
+            bundles.Add(new ScriptBundle("~/bundles/LessonPanel").Include(
+                        "~/Areas/StudyArea/Scripts/LessonPanel.js"));
+
+            bundles.Add(new StyleBundle("~/Content/css/LessonPanel").Include(
+                      "~/Areas/StudyArea/Content/LessonPanel.css"));
             //*******************slick slider bundles****************************
             bundles.Add(new StyleBundle("~/Content/Slick/css").Include(
                      "~/Content/Slick/slick.css",
