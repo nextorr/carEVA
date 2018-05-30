@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "infograph";
+}
+@section HeadStyles{
+    @Styles.Render("~/Content/infographGame/css")
+}
+
+
+<h2>Juego de Relacion</h2>
+
+<div id="droptarget">
+    <div class="eva-infograph eva-baby-room" data-eva-match="babyroom" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/habitacion-bebe-resized.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div></div>
+    <div class="eva-infograph eva-child-room" data-eva-match="childoom" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/habitacion-pequena-infografia.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div></div>
+    <div class="eva-clear-float"></div>
+    <div class="eva-infograph eva-bathroom" data-eva-match="bathroom" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/bano-casa-infografia.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div></div>
+    <div class="eva-infograph eva-main-room" data-eva-match="mainroom" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/habitacion-grande-infografia.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div></div>
+    <div class="eva-clear-float"></div>
+    <div class="eva-infograph eva-living" data-eva-match="living" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/sala-casa-infografia.png" />
+        <div class="" >
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div>
+    </div>
+    <div class="eva-infograph eva-kitchen" data-eva-match="kitchen" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/cocina-casa-infografia.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div>
+    </div>
+    <div class="eva-infograph eva-laudry" data-eva-match="laundry" data-eva-result="starting">
+        <img src="~/Areas/StudyArea/Content/images/cuarto-lavado-infografia.png" />
+        <div class="">
+            <p class="eva-correct-message-title eva-hide-message">¡MUY BIEN HAS ACERTADO!</p>
+            <p class="eva-correct-message eva-hide-message">siempre tienes que cerrar la llave del agua</p>
+            <p class="eva-incorrect-message-title eva-hide-message">AQUI NO CORRESPONDE</p>
+            <p class="eva-incorrect-message eva-hide-message">tienes que poner atención e interntarlo nuevamente</p>
+        </div>
+    </div>
+    <div class="eva-clear-float"></div>
+</div>
+
+<div id="draggable" data-eva-match="kitchen"></div>
+<div id="draggable2" data-eva-match="laundry"></div>
+
+
+@section FootScripts{
+    @Scripts.Render("~/bundles/infographGame")
+}

@@ -95,12 +95,23 @@
     </div>
 </script>
 
+<script type="text/x-kendo-template" id="right-activity-upload-template">
+    <div id="eva-activity-upload" class="eva-activity-upload-instructions">
+        #= #
+    </div>
+    @* Try to implement the file upload plus functionality, has some nice features *@
+    <form action="/" method="post" enctype="multipart/form-data">
+        <input type="file" name="activityFile" value="" />
+        <input type="submit" name="Cargar" value="Cargar" />
+    </form>
+</script>
+
 @* start of visible elements *@
 <div id="eva-lesson-panel-main-layout-anchor"></div>
 
 @*<p>Lecciones del Curso</p>
-<div id="eva-chapters-panel"
-     class="eva-chapters-menu"></div>*@
+    <div id="eva-chapters-panel"
+            class="eva-chapters-menu"></div>*@
 
 @section FootScripts{
     <script type="text/javascript">

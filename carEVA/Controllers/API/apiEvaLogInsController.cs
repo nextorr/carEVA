@@ -39,6 +39,7 @@ namespace carEVA.Controllers.API
         {
             //use this to test the log database
             db.Configuration.ProxyCreationEnabled = false;
+            //return Ok(db.evaBaseUser.ToList()); //use this to see how the JSON serializer handle inheritance
             return Ok(new evaResponses("method not implemented", "Ok"));
         }
 

@@ -1,0 +1,111 @@
+﻿.demo-section {
+    padding-top: 100px;
+    position: relative;
+}
+        
+#draggable {
+    cursor: move;
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    margin-left: -28px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #03a9f4;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+#draggable2 {
+    cursor: move;
+    position: absolute;
+    top: 30px;
+    left: 60%;
+    margin-left: -28px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: orangered;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.23), 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+#droptarget {
+    padding: 20px;
+    cursor: default;
+    vertical-align: middle;
+    text-align: center;
+    border: 2px dotted #ccc;
+    
+}
+
+.test1,
+.test2 {
+    vertical-align: middle;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    line-height: 1.5em;
+    margin: 10px;
+    padding: 20px;
+    font-size: 14px;
+    font-weight: normal;
+    color: #fff;
+}
+.test1 {
+    background-color: #3f51b5;
+}
+.test2 {
+    background-color: #ee6f0b;
+}
+
+*+html .test1,
+*+html .test2 {
+    margin-top: 50px;
+    display: inline;
+    zoom: 1;
+}
+
+.eva-infograph {
+    position:relative;
+    float:left;
+    border:  3px solid orange;
+    /*border-top: 14px solid rgb(0,65,101);
+    border-right: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 14px solid rgb(0,65,101);*/
+}
+
+.eva-infograph img {
+    width:280px;
+}
+
+.eva-feedback-infograph {
+    background-color:rgba(0, 0, 0, 0.2);
+    top:0;
+    height:99%;
+    width:99%;
+    position: absolute;
+}
+
+.eva-correct-message-title {
+    font-weight:bold;
+}
+
+.eva-incorrect-message-title {
+    font-weight:bold;
+}
+.eva-correct-message {
+    font-size:15px;
+}
+
+.eva-incorrect-message {
+    font-size:15px;
+}
+
+.eva-hide-message {
+    display:none;
+}
+
+.eva-clear-float{
+    clear:both;
+}

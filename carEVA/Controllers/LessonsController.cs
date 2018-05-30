@@ -75,7 +75,6 @@ namespace carEVA.Controllers
                 ViewBag.ChapterID = new SelectList(db.Chapters.Where(c => c.ChapterID == chapterID), "ChapterID", "title");
                 ViewBag.backToID = chapterID;
             }
-            //ViewBag.ChapterID = new SelectList(db.Chapters, "ChapterID", "title");
             return View();
         }
 
@@ -84,42 +83,53 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "LessonID,title,description,videoURL,ChapterID")] Lesson lesson, int? chapterID)
+        public ActionResult Create([Bind(Include = "LessonID,lessonType,title,description,videoURL,activityInstructions,ChapterID")] Lesson lesson, int? chapterID)
         {
-            evaMediaServices mediaService = new evaMediaServices();
-            string fileLocation;
+            if (!ModelState.IsValid)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            int courseID = db.Chapters.Find(lesson.ChapterID).CourseID;
+            if (courseUtils.incrementTotalLessons(db, courseID) != 1)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Course not found");
+            }
+            //TODO this is the quick and dirty approach to handle different lessonTypes
+            //investigate how we can make this more modular.
+            switch (lesson.lessonType)
+            {
+                case evaLessonTypes.VideoLesson:
+                    evaMediaServices mediaService = new evaMediaServices();
+                    string fileLocation;
+                    
+                    //save the file location and give the user feedback that the video is uploading
+                    fileLocation = lesson.videoURL;
+                    lesson.videoURL = "Procesando y publicando video";
+                    
+                    //use the lesson ID to save the video in the backgroud.
+                    //in video URL we receive the location on file System, use that info to upload the video to azure
+                    //this method start a tread to handle the upload in the backgroud
+                    mediaService.uploadVideoToAzure(fileLocation, lesson.LessonID);
+                    break;
+                case evaLessonTypes.ActivityUpload:
+                    lesson.videoURL = "No Aplica";
+                    break;
+                case evaLessonTypes.Infograph:
+                    break;
+                case evaLessonTypes.Crossword:
+                    break;
+                case evaLessonTypes.Exam:
+                    break;
+                default:
+                    //if we end up here there is a lesson missmatch
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Lesson type missmatch");
+                    break;
+            }
 
-            if (ModelState.IsValid)
-            {
-                int courseID = db.Chapters.Find(lesson.ChapterID).CourseID;
-                if(courseUtils.incrementTotalLessons(db, courseID) != 1)
-                {
-                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Course not found");
-                }
-                //save the file location and give the user feedback that the video is uploading
-                fileLocation = lesson.videoURL;
-                lesson.videoURL = "Procesando y publicando video";
-                //succesfully added one to the course model, persist the data
-                db.Lessons.Add(lesson);
-                db.SaveChanges();
-                //use the lesson ID to save the video in the backgroud.
-                //in video URL we receive the location on file System, use that info to upload the video to azure
-                //this method start a tread to handle the upload in the backgroud
-                mediaService.uploadVideoToAzure(fileLocation, lesson.LessonID);
-                return RedirectToAction("Index", new { chapterID = lesson.ChapterID});
-            }
-            //now handle the chapter ID info
-            if (chapterID == null)
-            {
-                ViewBag.ChapterID = new SelectList(db.Chapters, "ChapterID", "title", lesson.ChapterID);
-            }
-            else
-            {
-                ViewBag.ChapterID = new SelectList(db.Chapters.Where(c => c.ChapterID == chapterID), "ChapterID", "title", lesson.ChapterID);
-                ViewBag.backToID = chapterID;
-            }
-            //ViewBag.ChapterID = new SelectList(db.Chapters, "ChapterID", "title", lesson.ChapterID);
-            return View(lesson);
+            //all the specifics where succesfull, persist the data
+            db.Lessons.Add(lesson);
+            db.SaveChanges();
+            return RedirectToAction("Index", new { chapterID = lesson.ChapterID });
         }
 
         // GET: Lessons/Edit/5

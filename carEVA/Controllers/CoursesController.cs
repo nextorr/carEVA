@@ -236,6 +236,8 @@ namespace carEVA.Controllers
                 {
                     course.createdByID = await instructorUtils.instructorIdFromAsp(db, User.Identity.GetUserId(), userManager);
                     //some default values for the organization course
+                    //by default the current logged user is the instructor of the course
+                    orgCourse.evaInstructorID = course.createdByID;
                     orgCourse.evaOrganizationID = await userUtils.organizationIdFromAspIdentity(db, User.Identity.GetUserId());
                     course.organizationCourse = new List<evaOrganizationCourse>() {orgCourse};
                     db.Courses.Add(course);
@@ -251,6 +253,23 @@ namespace carEVA.Controllers
                     return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Error al encontrar la organizacion para actualizar contadores");
                 }
 
+                db.SaveChanges();
+
+                //now with the course ID we need to create the permission ACL.
+                //as may 2018 we are enabling full access to all the CAR areas when created here
+                List<evaOrgCourseAreaPermissions> permissions = new List<evaOrgCourseAreaPermissions>();
+                List<evaOrganizationArea> orgAreas = db.evaOrganizations.Where(a => a.evaOrganizationID == orgCourse.evaOrganizationID)
+                    .SelectMany(m => m.evaAreas).ToList();
+                foreach (evaOrganizationArea item in orgAreas)
+                {
+                    permissions.Add(new evaOrgCourseAreaPermissions
+                    {
+                        evaOrganizationCourseID = orgCourse.evaOrganizationCourseID,
+                        evaOrganizationAreaID = item.evaOrganizationAreaID,
+                        permissionLevel = areaPermission.canEnrol
+                    });
+                }
+                db.evaOrgCourseAreaPermissions.AddRange(permissions);
                 db.SaveChanges();
 
                 //redirect back according to the external course definition
@@ -392,6 +411,17 @@ namespace carEVA.Controllers
             //TODO: make sure that we always store the courseID, verify this in the creation of the entry in the file controller
             db.Files.RemoveRange(db.Files.Where(f => f.courseID == id));
 
+            //remove the assocualtes ACLs
+            //call toList to populate the items
+            foreach (evaOrganizationCourse item in course.organizationCourse.ToList())
+            {
+                //remove the permission table from the course, as it does not allow cascade delete
+                db.evaOrgCourseAreaPermissions.RemoveRange(db.evaOrgCourseAreaPermissions
+                    .Where(m => m.evaOrganizationCourseID == item.evaOrganizationCourseID));
+            }
+            
+
+            //TODO: should i be deleting the organization course instead?
             //the FK_dbo.evaOrganizationCourses_dbo.Courses_courseID has cascade delelte enabled
             //so deleting the course will delete the organization course.
             db.Courses.Remove(course);

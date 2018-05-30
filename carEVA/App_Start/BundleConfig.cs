@@ -28,6 +28,18 @@ namespace carEVA
                      "~/Content/Slick/slick.css",
                      "~/Content/Slick/slick-theme.css"));
 
+            //*******************infograph game bundles****************************
+            bundles.Add(new ScriptBundle("~/bundles/infographGame").Include(
+                        "~/Areas/StudyArea/Scripts/infographGame.js"));
+
+            bundles.Add(new StyleBundle("~/Content/infographGame/css").Include(
+                      "~/Areas/StudyArea/Content/infographGame.css"));
+            //*******************summernote WYSIWYG editor bundles****************************
+            bundles.Add(new ScriptBundle("~/bundles/summernote").Include(
+                        "~/Scripts/summernote/summernote.js"));
+
+            bundles.Add(new StyleBundle("~/Content/summernote/css").Include(
+                     "~/Content/summernote/summernote.css"));
             //*******************JavaScript bundles****************************
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                         "~/Scripts/jquery-{version}.js"));

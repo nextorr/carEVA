@@ -66,6 +66,8 @@ namespace carEVA.Models
     public class Lesson
     {
         public int LessonID { get; set; }
+        [DisplayName("Tipo de Actividad")]
+        public evaLessonTypes lessonType{ get; set; }
         [DisplayName("Leccion")]
         public string title { get; set; }
         [DisplayName("Descripcion")]
@@ -73,9 +75,13 @@ namespace carEVA.Models
         public string description { get; set; }
         //the lesson conten as 1/04/2016 is a video
         [DataType(DataType.MultilineText)]
+        //properties for the lessonType = video Lesson
         public string videoURL { get; set; }
         public string videoName { get; set; }
         public string videoStorageName { get; set; }
+        //properties for the lessonType = Activity Upload
+        [AllowHtml] // since this is intended to be a rich text field
+        public string activityInstructions{ get; set; }
         public int ChapterID { get; set; }
         public virtual Chapter Chapter { get; set; }
         public virtual ICollection<Question> questions { get; set; }
@@ -111,8 +117,11 @@ namespace carEVA.Models
     //**********END OFCOURSE MODEL DEFINITION*************
     //*********************************************************************************************
 
+
+
     //*********************************************************************************************
     //*********STUDENT AND GRADING MODEL DEFINITION***********
+    //all this block of models are marked to delete, evaluate the impact and eventually remove all this classes
     public class Student
     {
         public int StudentID { get; set; }

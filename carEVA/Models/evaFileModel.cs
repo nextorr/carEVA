@@ -19,9 +19,11 @@ namespace carEVA.Models
         public int? courseID { get; set; }
         public int? chapterID { get; set; }
         public int? lessonID { get; set; }
+        public int? evaLessonDetailID { get; set; }
         public virtual Course Course { get; set; }
         public virtual Chapter Chapter { get; set; }
         public virtual Lesson Lesson { get; set; }
+        public virtual evaLessonDetail evaLessonDetail { get; set; }
     }
     //generic image store
     public class evaImage

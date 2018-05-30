@@ -23,6 +23,9 @@ namespace carEVA
             config.Formatters.JsonFormatter.SerializerSettings
                 .ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
+            //add this to enable the enum literal to be sent down the wire on the JSON
+            //https://stackoverflow.com/questions/35163132/global-configuration-of-enum-serialization-to-string-is-ignored
+            config.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
             // Web API routes
             config.MapHttpAttributeRoutes();
 

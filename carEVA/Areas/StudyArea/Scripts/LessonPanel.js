@@ -12,6 +12,7 @@ if (typeof (publicKey) == 'undefined' || typeof (courseID) == 'undefined') {
 
 //global variable to store the current video URL, see if there is a better way
 var videoSource = "";
+var activityInstructions = "";
 
 var lessonsData = new kendo.data.DataSource({
     transport: {
@@ -37,45 +38,6 @@ var fileData = new kendo.data.DataSource({
     pageSize: 15,
     error: function (e) {
         console.log("error reading fileData on: ");
-    }
-});
-
-//use the hirerchical data source to query the question list
-
-var Xdatasource = new kendo.data.HierarchicalDataSource({
-    data: [
-      {
-          categoryName: "SciFi",
-          movies: [
-            {
-                title: "Star Wars: A New Hope", year: 1977, cast: [
-                  { actor: "Mark Hamill", character: "Luke Skywalker" },
-                  { actor: "Harrison Ford", character: "Han Solo" },
-                  { actor: "Carrie Fisher", character: "Princess Leia Organa" }
-                ]
-            },
-            {
-                title: "Star Wars: The Empire Strikes Back", year: 1980, cast: [
-                  { actor: "Mark Hamill", character: "Luke Skywalker" },
-                  { actor: "Harrison Ford", character: "Han Solo" },
-                  { actor: "Carrie Fisher", character: "Princess Leia Organa" },
-                  { actor: "Billy Dee Williams", character: "Lando Calrissian" }
-                ]
-            }
-          ]
-      }
-    ],
-    schema: {
-        model: {//first level
-            children: { // define options for second level
-                schema: {
-                    data: "movies",
-                    model: {
-                        children: "cast" // third level is defined by the field "cast"
-                    }
-                }
-            }
-        }
     }
 });
 
@@ -133,6 +95,17 @@ var videoLessonModel = kendo.observable({
     },
 });
 
+
+var activityUploadModel = kendo.observable({
+    fileItems: fileData,
+    questionItems: questionDataSource,
+    readFileList: function (lessonID) {
+        fileData.read({ id: lessonID });
+    },
+    onSelect: function () {
+        console.log("selected item")
+    },
+});
 //var lessonsModel = kendo.observable({
 //    items: lessonsData,
 //    onBound: function (e) {
@@ -155,6 +128,7 @@ var rootLayout = new kendo.Layout("main-layout-template");
 var leftMenuLayout = new kendo.Layout("left-lessons-template");
 var welcomePageLayout = new kendo.Layout("right-course-welcome-template");
 var righVideoPanelLayout = new kendo.Layout("right-video-template", { model: videoLessonModel });
+var righActivityUploadLayout = new kendo.Layout("right-activity-upload-template", { model: activityUploadModel });
 
 var lessonPanelRouter = new kendo.Router({
     init: function () {
@@ -210,14 +184,22 @@ lessonPanelRouter.route("/", function () {
                                         LessonID: data[$(item).index()].info.LessonID,
                                         lessonDetailID: data[$(item).index()].userDetail.evaLessonDetailID,
                                         videoURL: data[$(item).index()].info.videoURL,
+                                        activityInstructions: data[$(item).index()].info.activityInstructions,
+                                        lessonIdx: $(item).index(),
                                     };
                                 });
+
                         //we expect it to always be an array of just one element
+                        //set the global variables
                         videoSource = selected[0].videoURL;
+                        activityInstructions = selected[0].activityInstructions;
+
                         console.log("lessonID: " + selected[0].LessonID +
                             " lessonDetailID: " + selected[0].lessonDetailID +
-                            " videoURL " + selected[0].videoURL);
-                        lessonPanelRouter.navigate("/content/" + selected[0].LessonID + "/" + selected[0].lessonDetailID);
+                            " videoURL " + selected[0].videoURL +
+                            " rootObjetcIdx: " + idx );
+                        lessonPanelRouter.navigate("/content/" + selected[0].LessonID + "/"
+                            + selected[0].lessonDetailID + "/" + idx + "/" + selected[0].lessonIdx);
                     }
                 })
             })
@@ -226,8 +208,9 @@ lessonPanelRouter.route("/", function () {
     });
 });
 
-lessonPanelRouter.route("/content/:lessonID/:lessonDetailID", function (lessonID, lessonDetailID) {
-
+//rootIdx represent the index of the first level of objets, so we can fully navigate the lesson detail structure
+lessonPanelRouter.route("/content/:lessonID/:lessonDetailID/:rootIdx/:lessonIdx"
+    , function (lessonID, lessonDetailID, rootIdx, lessonIdx) {
     //if there are no parameters on the route, navigate to the default page
     if (lessonID === "undefined" || lessonDetailID === "undefined") {
         lessonPanelRouter.navigate("/");
@@ -241,18 +224,35 @@ lessonPanelRouter.route("/content/:lessonID/:lessonDetailID", function (lessonID
         $("#eva-video source").attr('src', "");
         $("#eva-video")[0].load();
     }
-    //implement the logic to show the corresponding content on the panel
-    rootLayout.showIn("#right-panel-anchor", righVideoPanelLayout);
-    $("#eva-video source").attr('src', videoSource);
-    $("#eva-video")[0].load();
 
-    $("#tabstrip").kendoTabStrip({
-        animation: {
-            open: {
-                effects: "fadeIn"
-            }
-        }
-    });
+    var temp = lessonsData.data();
+    //check the type of the lesson to render
+    var lessonType = lessonsData.data()[rootIdx].lessons[lessonIdx].info.lessonType;
+
+    switch (lessonType) {
+        case "VideoLesson":
+            //implement the logic to show the corresponding content on the panel
+            rootLayout.showIn("#right-panel-anchor", righVideoPanelLayout);
+            $("#eva-video source").attr('src', videoSource);
+            $("#eva-video")[0].load();
+
+            $("#tabstrip").kendoTabStrip({
+                animation: {
+                    open: {
+                        effects: "fadeIn"
+                    }
+                }
+            });
+            break;
+        case "ActivityUpload":
+            rootLayout.showIn("#right-panel-anchor", righActivityUploadLayout);
+            //html replace
+            //TODO: see if there is a way of doing this with model
+            $("#eva-activity-upload").empty().html(activityInstructions);
+            //TODO: call the detail to upload de file
+            break;
+        default:
+    }
 });
 
 

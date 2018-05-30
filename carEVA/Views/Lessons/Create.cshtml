@@ -7,6 +7,7 @@
 @section Styles {
     @Styles.Render("~/Content/fileUpload")
     @Styles.Render("~/Content/evaFileUpload")
+    @Styles.Render("~/Content/summernote/css")
 }
 
 <h2>Nueva Leccion</h2>
@@ -21,6 +22,15 @@
     <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.lessonType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EnumDropDownListFor(model => model.lessonType, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.lessonType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
         <div class="form-group">
             @Html.LabelFor(model => model.title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -71,6 +81,14 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.activityInstructions, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.activityInstructions, new { @class = "form-control input-lg textarea-editor" })
+                @Html.ValidationMessageFor(model => model.activityInstructions, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="submit" value="Crear" class="btn btn-default" />
             </div>
@@ -96,4 +114,17 @@
     @Scripts.Render("~/bundles/jqueryUI")
     @Scripts.Render("~/bundles/fileUpload")
     @Scripts.Render("~/bundles/evaVideoUpload")
+    @Scripts.Render("~/bundles/summernote")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Initialize Editor  
+            $('.textarea-editor').summernote({
+                height: 300, // set editor height  
+                minHeight: null, // set minimum height of editor  
+                maxHeight: null, // set maximum height of editor  
+                focus: true // set focus to editable area after initializing summernote  
+            });
+        });
+    </script>
 }

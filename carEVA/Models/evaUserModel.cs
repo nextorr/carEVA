@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Mvc;
 
@@ -17,6 +18,24 @@ namespace carEVA.Models
         static private readonly string[] genderDefinition = {"", "M", "F" };
         static public List<string> genderList { get { return genderDefinition.ToList(); } }
     }
+
+    //*********************************************************************************************
+    //take special care of the enum values, as they define the branching loginc on the clients
+    public enum evaLessonTypes
+    {
+        [EnumMember(Value = "VideoLesson")]
+        VideoLesson,
+        [EnumMember(Value = "ActivityUpload")]
+        ActivityUpload,
+        [EnumMember(Value = "Infograph")]
+        Infograph,
+        [EnumMember(Value = "Crossword")]
+        Crossword,
+        [EnumMember(Value = "Exam")]
+        Exam
+    }
+
+    //*********************************************************************************************
     public class evaLogIn
     {
         public string user { get; set; }
@@ -173,6 +192,7 @@ namespace carEVA.Models
         //navigation properties
         public virtual evaCourseEnrollment courseEnrollment { get; set; }
         public virtual ICollection<evaQuestionDetail> questionDetail { get; set; }
+        public virtual ICollection<evaFile> userActivityFiles { get; set; }
 
     }
     public class evaQuestionDetail
