@@ -1,0 +1,113 @@
+﻿@{
+    Layout = null;
+}
+
+@{
+    ViewBag.Title = "Crucigrama";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - EVA</title>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    @Scripts.Render("~/bundles/jqcrossword")
+    @Styles.Render("~/Content/jqcrossword/css")
+</head>
+<body>
+    
+
+    <h2>crossword</h2>
+
+    <div id="puzzle-wrapper"><!-- crossword puzzle appended here --></div>
+
+
+    <script type="text/javascript">
+        (function ($) {
+            $(function () {
+                // provide crossword entries in an array of objects like the following example
+                // Position refers to the numerical order of an entry. Each position can have
+                // two entries: an across entry and a down entry
+                var puzzleData = [
+                    
+                        {
+                            clue: "proceso por el cual se limpia en una planta de tratamiento la suciedad del agua, se desinfecta y se eliminan las bacterias para que quede apta para el consumo humano",
+                            answer: "potabilizacion",
+                            position: 1,
+                            orientation: "across",
+                            startx: 1,
+                            starty: 2
+                        },
+                        {
+                            clue: "proceso por el cual se capta el agua de rios y quebradas para llevarla por grandes tuberias hasta la planta de tratamiento",
+                            answer: "captacion",
+                            position: 3,
+                            orientation: "across",
+                            startx: 3,
+                            starty: 4
+                        },
+                        {
+                            clue: "etapa en la cual el vapor de agua se enfria volviendo a su estado liquido, formado nubes compuestas por muchas gotas de agua",
+                            answer: "condensacion",
+                            position: 6,
+                            orientation: "across",
+                            startx: 5,
+                            starty: 11
+                        },
+                        {
+                            clue: "etapa en la cual el agua, una vez utlizada, viaja por redes de tuberías, llegando hasta una planta de tratamiento, que se encarga de quitar el mayor número de sustancias contaminantes, para luego ser devuelta a las quebradas y ríos.",
+                            answer: "depuracion",
+                            position: 7,
+                            orientation: "across",
+                            startx: 4,
+                            starty: 14
+                        },
+                        {
+                            clue: "etapa en la cual el agua contenida en las nubes cae a la tierra en forma de lluvia, granizo y nieve almacenandose en oceanos, rios y lagos",
+                            answer: "precipitacion",
+                            position: 1,
+                            orientation: "down",
+                            startx: 1,
+                            starty: 2
+                        },
+                        {
+                            clue: "etapa en la cual el agua, ya apta para el consumo humano es conducida por tuberias a cada una de nuestras viviendas, donde de manera eficiente y haciendo un uso racional, la podemos utilizar",
+                            answer: "distribucion",
+                            position: 2,
+                            orientation: "down",
+                            startx: 6,
+                            starty: 1
+                        },
+                        
+                        {
+                            clue: "proceso por el cual parte del agua que cae a la tierra se filtra formando aguas subterraneas",
+                            answer: "filtracion",
+                            position: 4,
+                            orientation: "down",
+                            startx: 14,
+                            starty: 4
+                        },
+                         {
+                             clue: "proceso por el cual el agua liquida, debido al calor del sol, se convierte en vapor",
+                             answer: "evaporacion",
+                             position: 5,
+                             orientation: "down",
+                             startx: 12,
+                             starty: 5
+                         },
+                        
+                ]
+
+                $('#puzzle-wrapper').crossword(puzzleData);
+
+            })
+
+        })(jQuery)
+    </script>
+
+</body>
+</html>
+

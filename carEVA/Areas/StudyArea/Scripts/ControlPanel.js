@@ -1,6 +1,8 @@
 ﻿//base service URL, set them according to the endpoint you wish to use
-//var targetRootUrl = "http://evacar.azurewebsites.net/api"; //production endpoint 
-var targetRootUrl = "http://localhost:63052/api"; //local host eviroment
+if (typeof (targetRootUrl) == 'undefined') {
+    //if not defined on the calling Page, default to the cloud endpoint
+    var targetRootUrl = "http://evacar.azurewebsites.net/api";
+}
 
 
 if (typeof (publicKey) == 'undefined') {

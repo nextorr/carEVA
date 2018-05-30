@@ -83,7 +83,9 @@ namespace carEVA.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "LessonID,lessonType,title,description,videoURL,activityInstructions,ChapterID")] Lesson lesson, int? chapterID)
+        public ActionResult Create(
+            [Bind(Include = "LessonID,lessonType,title,description,videoURL,interactiveActivityURL,activityInstructions,ChapterID")]
+            Lesson lesson, int? chapterID)
         {
             if (!ModelState.IsValid)
             {
@@ -115,6 +117,7 @@ namespace carEVA.Controllers
                     lesson.videoURL = "No Aplica";
                     break;
                 case evaLessonTypes.Infograph:
+                    lesson.videoURL = "No Aplica";
                     break;
                 case evaLessonTypes.Crossword:
                     break;

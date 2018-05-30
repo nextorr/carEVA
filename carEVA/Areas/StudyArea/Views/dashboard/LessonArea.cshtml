@@ -97,13 +97,19 @@
 
 <script type="text/x-kendo-template" id="right-activity-upload-template">
     <div id="eva-activity-upload" class="eva-activity-upload-instructions">
-        #= #
+        
     </div>
     @* Try to implement the file upload plus functionality, has some nice features *@
     <form action="/" method="post" enctype="multipart/form-data">
         <input type="file" name="activityFile" value="" />
         <input type="submit" name="Cargar" value="Cargar" />
     </form>
+</script>
+
+<script type="text/x-kendo-template" id="right-minigame-iframe-template">
+    <iframe name="miniGameIframe" id="miniGameIframe" src=""
+            frameborder="0" border="0" cellspacing="0"
+            class="eva-minigame-iframe"></iframe>
 </script>
 
 @* start of visible elements *@
@@ -117,6 +123,15 @@
     <script type="text/javascript">
         var publicKey = "@ViewBag.publicKey"
         var courseID = "@ViewBag.courseID"
+        var targetRootUrl = "http://evacar.azurewebsites.net/api";
+        var debugNET = false;
+
+        @{if (HttpContext.Current.IsDebuggingEnabled)
+            {
+                @:targetRootUrl = "http://localhost:63052/api";
+                @:debugNET = true;
+            }
+        }
     </script>
     @Scripts.Render("~/bundles/LessonPanel")
 }

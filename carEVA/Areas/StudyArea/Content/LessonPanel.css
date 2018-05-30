@@ -84,3 +84,8 @@
     font-weight:normal;
     width:95%;
 }
+
+.eva-minigame-iframe {
+    width:100%;
+    height:720px;
+}

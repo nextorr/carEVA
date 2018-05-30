@@ -34,6 +34,12 @@ namespace carEVA
 
             bundles.Add(new StyleBundle("~/Content/infographGame/css").Include(
                       "~/Areas/StudyArea/Content/infographGame.css"));
+            //*******************jquery crossword game bundles****************************
+            bundles.Add(new ScriptBundle("~/bundles/jqcrossword").Include(
+                        "~/Areas/StudyArea/Scripts/jquery.crossword.js"));
+
+            bundles.Add(new StyleBundle("~/Content/jqcrossword/css").Include(
+                      "~/Areas/StudyArea/Content/jqcrossword.css"));
             //*******************summernote WYSIWYG editor bundles****************************
             bundles.Add(new ScriptBundle("~/bundles/summernote").Include(
                         "~/Scripts/summernote/summernote.js"));

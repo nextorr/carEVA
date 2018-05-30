@@ -144,6 +144,17 @@
 @section FootScripts{
     <script type="text/javascript">
         var publicKey = "@ViewBag.publicKey"
+
+        var targetRootUrl = "http://evacar.azurewebsites.net/api";
+        var debugNET = false;
+
+        @{if (HttpContext.Current.IsDebuggingEnabled)
+            {
+                @:targetRootUrl = "http://localhost:63052/api";
+                @:debugNET = true;
+            }
+        }
+</script>
     </script>
     @Scripts.Render("~/bundles/ControlPanel")
     

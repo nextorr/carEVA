@@ -17,5 +17,10 @@ namespace carEVA.Areas.StudyArea.Controllers
         public ActionResult infograph() {
             return View();
         }
+
+        public ActionResult crossword()
+        {
+            return View();
+        }
     }
 }

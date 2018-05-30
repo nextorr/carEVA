@@ -413,6 +413,10 @@
     <Compile Include="Migrations\201805281644354_ActivityUploadSupport.Designer.cs">
       <DependentUpon>201805281644354_ActivityUploadSupport.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805301511281_interactiveActivityURL.cs" />
+    <Compile Include="Migrations\201805301511281_interactiveActivityURL.Designer.cs">
+      <DependentUpon>201805301511281_interactiveActivityURL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\carEVAContext.cs" />
@@ -463,9 +467,11 @@
     <Content Include="Areas\StudyArea\Content\images\habitacion-pequena-infografia.png" />
     <Content Include="Areas\StudyArea\Content\images\sala-casa-infografia.png" />
     <Content Include="Areas\StudyArea\Content\infographGame.css" />
+    <Content Include="Areas\StudyArea\Content\jqcrossword.css" />
     <Content Include="Areas\StudyArea\Content\LessonPanel.css" />
     <Content Include="Areas\StudyArea\Scripts\ControlPanel.js" />
     <Content Include="Areas\StudyArea\Scripts\infographGame.js" />
+    <Content Include="Areas\StudyArea\Scripts\jquery.crossword.js" />
     <Content Include="Areas\StudyArea\Scripts\LessonPanel.js" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
@@ -1670,6 +1676,9 @@
     <Content Include="Content\summernote\font\summernote.ttf" />
     <Content Include="Content\summernote\font\summernote.eot" />
     <Content Include="Areas\StudyArea\Views\miniGames\infograph.cshtml" />
+    <Content Include="Areas\StudyArea\Views\miniGames\_ViewStart.cshtml" />
+    <Content Include="Areas\StudyArea\Views\Shared\_gameLayout.cshtml" />
+    <Content Include="Areas\StudyArea\Views\miniGames\crossword.cshtml" />
     <None Include="Properties\PublishProfiles\carEVA.pubxml" />
     <None Include="Properties\PublishProfiles\evacar - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\evacar - Web Deploy.pubxml" />
@@ -3960,6 +3969,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805281644354_ActivityUploadSupport.resx">
       <DependentUpon>201805281644354_ActivityUploadSupport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805301511281_interactiveActivityURL.resx">
+      <DependentUpon>201805301511281_interactiveActivityURL.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

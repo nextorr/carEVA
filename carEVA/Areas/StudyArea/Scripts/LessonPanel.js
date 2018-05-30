@@ -1,6 +1,9 @@
 ﻿//base service URL, set them according to the endpoint you wish to use
-//var targetRootUrl = "http://evacar.azurewebsites.net/api"; //production endpoint 
-var targetRootUrl = "http://localhost:63052/api"; //local host eviroment
+if (typeof (targetRootUrl) == 'undefined') {
+    //if not defined on the calling Page, default to the cloud endpoint
+    var targetRootUrl = "http://evacar.azurewebsites.net/api";
+}
+
 
 if (typeof (publicKey) == 'undefined' || typeof (courseID) == 'undefined') {
     alert("Ocurrio un error con tu usuario");
@@ -13,6 +16,7 @@ if (typeof (publicKey) == 'undefined' || typeof (courseID) == 'undefined') {
 //global variable to store the current video URL, see if there is a better way
 var videoSource = "";
 var activityInstructions = "";
+var minigameIframeURL = ""
 
 var lessonsData = new kendo.data.DataSource({
     transport: {
@@ -106,6 +110,12 @@ var activityUploadModel = kendo.observable({
         console.log("selected item")
     },
 });
+
+var miniGameModel = kendo.observable({
+    onSelect: function () {
+        console.log("selected item")
+    },
+});
 //var lessonsModel = kendo.observable({
 //    items: lessonsData,
 //    onBound: function (e) {
@@ -129,6 +139,7 @@ var leftMenuLayout = new kendo.Layout("left-lessons-template");
 var welcomePageLayout = new kendo.Layout("right-course-welcome-template");
 var righVideoPanelLayout = new kendo.Layout("right-video-template", { model: videoLessonModel });
 var righActivityUploadLayout = new kendo.Layout("right-activity-upload-template", { model: activityUploadModel });
+var miniGameLayout = new kendo.Layout('right-minigame-iframe-template', { model: miniGameModel })
 
 var lessonPanelRouter = new kendo.Router({
     init: function () {
@@ -185,6 +196,7 @@ lessonPanelRouter.route("/", function () {
                                         lessonDetailID: data[$(item).index()].userDetail.evaLessonDetailID,
                                         videoURL: data[$(item).index()].info.videoURL,
                                         activityInstructions: data[$(item).index()].info.activityInstructions,
+                                        miniGameURL: data[$(item).index()].info.interactiveActivityURL,
                                         lessonIdx: $(item).index(),
                                     };
                                 });
@@ -193,6 +205,7 @@ lessonPanelRouter.route("/", function () {
                         //set the global variables
                         videoSource = selected[0].videoURL;
                         activityInstructions = selected[0].activityInstructions;
+                        minigameIframeURL = selected[0].miniGameURL;
 
                         console.log("lessonID: " + selected[0].LessonID +
                             " lessonDetailID: " + selected[0].lessonDetailID +
@@ -250,6 +263,17 @@ lessonPanelRouter.route("/content/:lessonID/:lessonDetailID/:rootIdx/:lessonIdx"
             //TODO: see if there is a way of doing this with model
             $("#eva-activity-upload").empty().html(activityInstructions);
             //TODO: call the detail to upload de file
+            break;
+        case "Infograph":
+            rootLayout.showIn("#right-panel-anchor", miniGameLayout);
+            //TODO take special care of this
+            //a little hack to check if we are in debug
+            if (debugNET) {
+                minigameIframeURL = minigameIframeURL.replace("evacar.azurewebsites.net", "localhost:63052");
+            }
+
+            //change the source of the iframe to display the minigame
+            $("#miniGameIframe").attr('src', minigameIframeURL);
             break;
         default:
     }

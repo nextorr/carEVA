@@ -82,6 +82,10 @@ namespace carEVA.Models
         //properties for the lessonType = Activity Upload
         [AllowHtml] // since this is intended to be a rich text field
         public string activityInstructions{ get; set; }
+        //properties for the lessonType = Activity Upload
+        //MAY 2018: we are defining interactive activities and games as a self contained HTML SPA.
+        //so the front end has to load it from the following URL
+        public string interactiveActivityURL { get; set; }
         public int ChapterID { get; set; }
         public virtual Chapter Chapter { get; set; }
         public virtual ICollection<Question> questions { get; set; }
