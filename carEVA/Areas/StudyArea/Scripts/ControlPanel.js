@@ -107,6 +107,61 @@ var courseCatalogModel = kendo.observable({
         
         return temp;
     },
+    isEnrolled: function (orgCourse) {
+        //here course alone contains the roor definition of the current course
+        console.log("checked course : " + orgCourse.courseID.toString() + " for enrollment");
+        var isDisabled = true;
+        
+        if (!orgCourse.course.enrollments) {
+            //if the enrrollments is any falsey value return that the button is NOT diabled.
+            return !isDisabled;
+        }
+        
+        //return that the button IS diabled
+        return isDisabled;
+    },
+    buttonText: function (orgCourse) {
+        if (this.isEnrolled(orgCourse)) {
+            return "Ya estas Inscrito"
+        }
+        return "Inscribirse";
+    },
+    enrollClick: function (e) {
+        //TODO: force button to an intermediate step "inscribiendo..."
+        //e.data contains the root of the service response
+        var temp = e.data;
+        console.log("click on the courseID: " + temp.courseID.toString() + "to enroll");
+
+        //put the button in an intermeditate state until inscription is completed or fails
+        $(e.currentTarget).prop("disabled", true);
+        $(e.currentTarget).html("Inscribiendo...")
+
+        $.ajax({
+            url: targetRootUrl + "/courseEnrollments",
+            type: "POST",
+            cache: false,
+            data: JSON.stringify({ publicKey: publicKey, courseID: temp.courseID }),
+            contentType: "application/json",
+            dataType: "json",
+            processData: true,
+            success: function (data) {
+                alert('Inscripcion Exitosa');
+                
+                courseCatalogData.read();
+                courseCatalogModel.set("items", courseCatalogData);
+
+                //TODO: force button disabling as the update is not inmediate
+            },
+            error: function (response) {
+                //use messages to debug the service
+                alert('Error: ' + response.statusText);
+                //if the inscription fails, re enable the button from the intermediate state
+                $(e.currentTarget).prop("disabled", false);
+                $(e.currentTarget).html("Inscribirse")
+            }
+        });
+        return temp;
+    },
 });
 
 var myCoursesModel = kendo.observable({

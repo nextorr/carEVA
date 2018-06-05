@@ -4,14 +4,14 @@
 table { 
 	border-collapse: collapse; 
 	border-spacing: 0; 
-	max-width: 100%;
+	max-width: 720px;
 }
 table tr{
 	width: 100%;
 }
 table td {
-	width: 5em;
-	height: 5em;
+	width: 3em;
+	height: 3em;
 	border: 1px solid #cdcdcd;
 	padding: 0;
 	margin: 0;
@@ -25,7 +25,7 @@ td input {
 	padding: 0em;
 	border: none;
 	text-align: center;
-	font-size: 3em;
+	font-size: 2.7em;
 	color: #666;
 	background-color: #f4f4f4;
 }
@@ -58,20 +58,21 @@ input.done {
 		
 #puzzle-wrapper {
 	float: left;
-	width: 54%;
-	margin-right: 3%;
+	width: 50%;
+	margin-right: 4px;
 }
 #puzzle-clues {
 	float: left;
-	width: 40%;
+	width: 45%;
 }
 
 #puzzle-clues ol{
-	list-style-type: none;
+    list-style: none;
+    padding-left: 4px;
 }
 		
 #puzzle-clues li{
-	font-size: 1.2em;
+	font-size: 1.4em;
 	margin: .3em;
 	line-height: 1.6em;
 }

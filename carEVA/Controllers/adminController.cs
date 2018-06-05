@@ -163,10 +163,10 @@ namespace carEVA.Controllers
 
         //the actions below are used to get the user course and lessons detail info from the DB.
         public ActionResult userDataAdmin(int? evaUserID) {
-            ViewBag.evaUserID = new SelectList(db.evaUsers, "ID", "fullName");
+            ViewBag.evaUserID = new SelectList(db.evaBaseUser, "ID", "fullName");
             if (evaUserID != null && Request.IsAjaxRequest())
             {
-                List<evaCourseEnrollment> enrollments = db.evaUsers.Find(evaUserID).CourseEnrollments.ToList();
+                List<evaCourseEnrollment> enrollments = db.evaBaseUser.Find(evaUserID).CourseEnrollments.ToList();
                 return PartialView("_userInformation", enrollments);
             }
             return View(new List<evaCourseEnrollment>());

@@ -24,6 +24,11 @@ namespace carEVA.Controllers.API
         }
 
         // GET: api/evaFiles/5
+        /// <summary>
+        /// get a list of files related to the given lesson
+        /// </summary>
+        /// <param name="id">Lesson ID to get the files from</param>
+        /// <returns></returns>
         [ResponseType(typeof(evaFile))]
         public IHttpActionResult GetevaFile(int id)
         {

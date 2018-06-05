@@ -187,6 +187,10 @@ namespace carEVA.Controllers.API
         public IHttpActionResult Postgrader([FromBody]quizResponses quizResponse)
         {
             db.Configuration.ProxyCreationEnabled = false;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             //evaLessonDetail currentLessonDetail = db.evaLessonDetails.Find(quizResponse.lessonDetailID);
             evaLessonDetail currentLessonDetail = db.evaLessonDetails.Include(m => m.courseEnrollment).Include(m => m.questionDetail.Select(q=>q.answerHistory)).
                 FirstOrDefault(q => q.evaLessonDetailID == quizResponse.lessonDetailID);

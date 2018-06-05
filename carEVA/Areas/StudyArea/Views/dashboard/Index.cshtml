@@ -88,7 +88,8 @@
                     #= course.totalLessons# 
                 </div>
             </div>
-            <div class="eva-clear-float"></div>
+            <div class="eva-clear-float" ></div>
+            <button type="button" name="enrollButton" data-bind="disabled: isEnrolled, click: enrollClick, html: buttonText"></button>
         </div>
     </li>
 </script>

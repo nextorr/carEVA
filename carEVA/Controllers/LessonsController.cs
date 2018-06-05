@@ -120,6 +120,7 @@ namespace carEVA.Controllers
                     lesson.videoURL = "No Aplica";
                     break;
                 case evaLessonTypes.Crossword:
+                    lesson.videoURL = "No Aplica";
                     break;
                 case evaLessonTypes.Exam:
                     break;

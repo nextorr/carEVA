@@ -82,9 +82,13 @@ namespace carEVA.Controllers
                     //myCourse = db.evaOrganizationAreas.Where(o => o.isExternal == false)
                     //.SelectMany(m => m.organizationCourses).Where(m => m.evaColaboratorID == instructorID)
                     //.Select(c => c.course),
-                    myCourse = colaboratorOf
-                        .Intersect(externalCourse, new evaOrganizationCourseComparer())
-                        .Select(m => m.course).ToList(),
+                    //this selects all the internal courses the colaborator has access to
+                    //myCourse = colaboratorOf
+                    //    .Intersect(externalCourse, new evaOrganizationCourseComparer())
+                    //    .Select(m => m.course).ToList(),
+
+                    //this selects all the internal and external courses the colaborator has access to
+                    myCourse = colaboratorOf.Select(m=>m.course).ToList(),
                     profileType = courseProfileTypes.sharedCourse
                 });
             }

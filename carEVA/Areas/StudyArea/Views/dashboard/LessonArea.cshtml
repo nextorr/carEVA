@@ -37,10 +37,24 @@
 <script type="text/x-kendo-template" id="question-item-template">
     @* take into account that we denormalized the question property *@
     # if (item.statement) { #
-    <p>#: item.statement #</p>
+    # if (!item.isCorrect) { #
+    <p class="eva-question-header">#: item.statement #</p>
     # } else {#
-    <input type="radio" name="#: item.QuestionID #" value="#: item.AnswerID #" id="#: item.AnswerID #">
+    <p class="eva-question-header">#: item.statement # - Correcto!</p>
+    #}#
+    # } else {#
+    # if (!item.disabled) { #
+    <input type="radio" name="#: item.QuestionID #" value="#: item.AnswerID #" id="#: item.AnswerID #" required >
     <label for="#: item.AnswerID #"> #: item.text # </label>
+    # } else {#
+    # if (!item.isCorrect) { #
+    <input class="eva-question-correct" type="radio" name="#: item.QuestionID #" value="#: item.AnswerID #" id="#: item.AnswerID #" required disabled>
+    <label for="#: item.AnswerID #"> #: item.text #</label>
+    # } else {#
+    <input class="eva-question-correct" type="radio" name="#: item.QuestionID #" value="#: item.AnswerID #" id="#: item.AnswerID #" required checked disabled>
+    <label for="#: item.AnswerID #"> #: item.text #  - Correcto!</label>
+    #}#
+    #}#
     #}#
 </script>
 
@@ -75,19 +89,26 @@
         </ul>
         <div>
             <p>Archivos</p>
+            @* the auto-bind = false prevent querying the data service the first time is bound  *@
+            @* and requieres an explicit call to the read method on the dataSource *@
             <ul id="eva-resourceFiles"
                 class="eva-resourceFiles-List"
                 data-role="listview"
                 data-bind="source: fileItems"
+                data-auto-bind="false"
                 data-template="resource-files-template"></ul>
         </div>
         <div>
             <p>Quiz</p>
-            <div id="eva-quiz"
-                 class="eva-quiz-list"
-                 data-role="panelbar"
-                 data-template="question-item-template"
-                 data-bind="source: questionItems, events: { select: onSelect }"></div>
+            <form id="eva-quiz-form" data-bind='events: { submit: submitResponses }'>
+                <div id="eva-quiz"
+                     class="eva-quiz-list"
+                     data-role="panelbar"
+                     data-template="question-item-template"
+                     data-auto-bind="false"
+                     data-bind="source: questionItems, events: { select: onSelect }"></div>
+                <button class="k-button k-primary" type="submit" > Evaluar !</button>
+            </form>
         </div>
         <div>
             <p>Contacto con el profesor</p>

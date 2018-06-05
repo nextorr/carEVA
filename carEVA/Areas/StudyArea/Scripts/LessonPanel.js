@@ -16,7 +16,10 @@ if (typeof (publicKey) == 'undefined' || typeof (courseID) == 'undefined') {
 //global variable to store the current video URL, see if there is a better way
 var videoSource = "";
 var activityInstructions = "";
-var minigameIframeURL = ""
+var minigameIframeURL = "";
+
+//global validator
+var quizValidator;
 
 var lessonsData = new kendo.data.DataSource({
     transport: {
@@ -36,23 +39,24 @@ var fileData = new kendo.data.DataSource({
         read: {
             url: targetRootUrl + "/evafiles",
             dataType: "json",
-            data: {id: 93}
+            data: {id: 1} //a default non existent lesson ID.
         }
     },
     pageSize: 15,
     error: function (e) {
-        console.log("error reading fileData on: ");
+        console.log("Error reading the files");
     }
 });
 
 var questionDataSource = new kendo.data.HierarchicalDataSource({
     transport: {
         read: function (options) {
+            var temp = options;
             $.ajax({
                 url: targetRootUrl + "/questiondetails",
                 type: "GET",
                 cache: false,
-                data: { publicKey: publicKey, lessonDetailID: 1101 },
+                data: { publicKey: options.data.publicKey, lessonDetailID: options.data.lessonDetailID },
                 contentType: "application/json",
                 dataType: "json",
                 processData: true,
@@ -68,7 +72,17 @@ var questionDataSource = new kendo.data.HierarchicalDataSource({
                             }
                         }
                         //create a new property
-                        response["detail"] = item.detail;
+                        response["isCorrect"] = item.detail.isCorrect;
+                        response["lastGradedAnswerID"] = item.detail.lastGradedAnswerID;
+                        for (var i = 0; i < response.answerOptions.length; i++) {
+                            if (response.isCorrect) {
+                                //disable all the radio buttons
+                                response.answerOptions[i]["disabled"] = true;
+                            }
+                            if (response.lastGradedAnswerID === response.answerOptions[i].AnswerID) {
+                                response.answerOptions[i].isCorrect = true;
+                            }
+                        }
                         return response;
                     });
                     options.success(newData);
@@ -91,14 +105,101 @@ var questionDataSource = new kendo.data.HierarchicalDataSource({
 var videoLessonModel = kendo.observable({
     fileItems: fileData,
     questionItems: questionDataSource,
+    responses:[],
+    lessonDetailID:null,
     readFileList: function (lessonID) {
         fileData.read({id:lessonID});
     },
-    onSelect: function () {
+    onSelect: function (e) {
+        //detect the event on the Headers and return inmediatly
+        var temp = e;
         console.log("selected item")
+        var item = $(e.item);
+        if (item.find(".eva-question-header").length > 0 || item.find(".eva-question-correct").length > 0) {
+            //its a header element, or a correct answer group so do nothing
+            return;
+        }
+
+
+        var panelElement = item.closest(".k-panelbar");
+        var dataItem = this.questionItems.data();
+        var index = item.parentsUntil(panelElement, ".k-item").map(function () {
+            return $(this).index();
+        }).get().reverse();
+
+        if (!Array.isArray(index) || index.length <= 0) {
+            //doublw check we clicked on a header element, so do noting
+            return;
+
+        }
+        index.push(item.index());
+
+        console.log("selected question: " + dataItem[index[0]].QuestionID
+                    + "selected answer: " + dataItem[index[0]].answerOptions[index[1]].AnswerID);
+
+        this.addOrUpdateResponse(dataItem[index[0]].QuestionID, dataItem[index[0]].answerOptions[index[1]].AnswerID);
+
+    },
+    addOrUpdateResponse: function (_questionID, _answerID) {
+        for (var i = 0; i < this.responses.length; i++) {
+            if (this.responses[i].get("questionID") === _questionID) {
+                //since no question can have two answers
+                //the question has already been answered, so update the answer value
+                this.responses[i].set("answerID", _answerID);
+                return;
+            } 
+        }
+        //if we end up here, its a new question-answer pair, so add it to the array
+        this.responses.push({ questionID: _questionID, answerID: _answerID });
+    },
+    submitResponses: function (event) {
+        //responses submit handler
+        event.preventDefault();
+        var quizValidator = $("#eva-quiz-form").data("kendoValidator");
+        if (this.get("responses").length < this.questionItems.data().length) {
+            alert("hay preguntas sin responder.");
+            return;
+        }
+        //there is a case where the answers are fully filled but not the checkboxes, so we need the validate()
+        //reproduce it clicking to the left of the radiobutton
+        if ((this.get("responses").length >= this.questionItems.data().length) && !quizValidator.validate()) {
+            alert("hay preguntas sin responder.");
+            return;
+        }
+        var quizResponses = { publicKey: publicKey, lessonDetailID: this.get("lessonDetailID"), responses: this.get("responses") };
+        $.ajax({
+            url: targetRootUrl + "/grader",
+            type: "POST",
+            cache: false,
+            data: JSON.stringify(quizResponses),
+            contentType: "application/json",
+            dataType: "json",
+            processData: true,
+            success: function (data) {
+                if (data.passed) {
+                    alert('Felicitaciones, aprobaste con: ' + data.currentTotalGrade + " puntos");
+                } else {
+                    alert('Intenta nuevamente, obtuvisete: ' + data.currentTotalGrade + " puntos");
+                }
+                
+            },
+            error: function (response) {
+                //use messages to debug the service
+                alert('Error: ' + response.statusText);
+            }
+        });
     },
 });
-
+videoLessonModel.bind("change", function(e) {
+    if (e.field == "questionItems") {
+        var newItems = questionDataSource.data();
+        for (var i = 0; i < newItems.length; i++) {
+            if (newItems[i].isCorrect) {
+                videoLessonModel.addOrUpdateResponse(newItems[i].QuestionID, newItems[i].lastGradedAnswerID);
+            }
+        }
+    }
+});
 
 var activityUploadModel = kendo.observable({
     fileItems: fileData,
@@ -237,14 +338,17 @@ lessonPanelRouter.route("/content/:lessonID/:lessonDetailID/:rootIdx/:lessonIdx"
         $("#eva-video source").attr('src', "");
         $("#eva-video")[0].load();
     }
-
-    var temp = lessonsData.data();
     //check the type of the lesson to render
     var lessonType = lessonsData.data()[rootIdx].lessons[lessonIdx].info.lessonType;
 
     switch (lessonType) {
         case "VideoLesson":
             //implement the logic to show the corresponding content on the panel
+            //query files and questions with the correct information
+            fileData.read({ id: lessonID });
+            questionDataSource.read({ publicKey: publicKey, lessonDetailID: lessonDetailID });
+            videoLessonModel.set("lessonDetailID", lessonDetailID);
+
             rootLayout.showIn("#right-panel-anchor", righVideoPanelLayout);
             $("#eva-video source").attr('src', videoSource);
             $("#eva-video")[0].load();
@@ -256,6 +360,19 @@ lessonPanelRouter.route("/content/:lessonID/:lessonDetailID/:rootIdx/:lessonIdx"
                     }
                 }
             });
+            $("#eva-quiz-form").kendoValidator({
+                rules: {
+                    radio: function (input) {
+                        if (input.filter("[type=radio]") && input.attr("required")) {
+                            return $("#eva-quiz-form").find("[name=" + input.attr("name") + "]").is(":checked");
+                        }
+                        return true;
+                    }
+                },
+                messages: {
+                    radio: "Debes responder la pregunta",
+                },
+            });
             break;
         case "ActivityUpload":
             rootLayout.showIn("#right-panel-anchor", righActivityUploadLayout);
@@ -265,6 +382,17 @@ lessonPanelRouter.route("/content/:lessonID/:lessonDetailID/:rootIdx/:lessonIdx"
             //TODO: call the detail to upload de file
             break;
         case "Infograph":
+            rootLayout.showIn("#right-panel-anchor", miniGameLayout);
+            //TODO take special care of this
+            //a little hack to check if we are in debug
+            if (debugNET) {
+                minigameIframeURL = minigameIframeURL.replace("evacar.azurewebsites.net", "localhost:63052");
+            }
+
+            //change the source of the iframe to display the minigame
+            $("#miniGameIframe").attr('src', minigameIframeURL);
+            break;
+        case "Crossword":
             rootLayout.showIn("#right-panel-anchor", miniGameLayout);
             //TODO take special care of this
             //a little hack to check if we are in debug
